@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head><title>Chica's AI</title></head>
+<body style="font-family:Arial">
+<h1>🚀 Chica's AI - Powered by Puter.js</h1>
+
+<h3>🤖 AI Chat</h3>
+<button onclick="gptChat()">GPT-5-nano</button>
+<button onclick="claudeChat()">Claude Sonnet 4</button>
+
+<h3>✨ Streaming Essay</h3>
+<button onclick="streamEssay()">Stream Long Response</button>
+
+<h3>🗄️ Cloud Files</h3>
+<button onclick="writeFile()">Write File</button>
+<button onclick="readFile()">Read File</button>
+
+<h3>🔑 Key-Value Store</h3>
+<button onclick="setKV()">Set Preference</button>
+<button onclick="getKV()">Get Preference</button>
+
+<div id="output" style="white-space:pre-wrap;border:1px solid #ccc;padding:10px;max-height:400px;overflow:auto;"></div>
+
+<script src="https://js.puter.com/v2/"></script>
+<script>
+const out = document.getElementById('output');
+function log(text) { out.innerHTML += text + '\n'; out.scrollTop = out.scrollHeight; }
+
+async function gptChat() { 
+  log('GPT: ');
+  const resp = await puter.ai.chat('Quantum computing simply', {model:'gpt-5-nano'});
+  log(resp); 
+}
+
+async function claudeChat() { 
+  log('Claude: ');
+  const resp = await puter.ai.chat('Quantum computing simply', {model:'claude-sonnet-4'});
+  log(resp); 
+}
+
+async function streamEssay() {
+  log('Streaming essay...');
+  const stream = await puter.ai.chat('Impact of AI on society essay', {model:'claude-sonnet-4', stream:true});
+  for await (const part of stream) log(part.text);
+  log('✅ Stream done!');
+}
+
+async function writeFile() { 
+  await puter.fs.write('demo.txt', 'Hello cloud storage!');
+  log('✅ File written to Puter cloud'); 
+}
+
+async function readFile() { 
+  const content = await puter.fs.read('demo.txt');
+  log('📖 File: ' + await content.text()); 
+}
+
+async function setKV() { 
+  await puter.kv.set('theme', 'dark');
+  log('✅ KV set: theme=dark'); 
+}
+
+async function getKV() { 
+  const value = await puter.kv.get('theme');
+  log('🔑 Value: ' + value); 
+}
+</script>
+</body>
+</html>
