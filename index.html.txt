@@ -2,7 +2,7 @@
 <html>
 <head><title>Chica's AI</title></head>
 <body style="font-family:Arial">
-<h1>🚀 Chica's AI - Powered by Puter.js</h1>
+<h1>🚀 Chica's AI </h1>
 
 <h3>🤖 AI Chat</h3>
 <button onclick="gptChat()">GPT-5-nano</button>
