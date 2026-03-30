@@ -1,31 +1,70 @@
-<div align="left">
-  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg" height="30" alt="react logo"  />
-  <img width="12" />
-  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/css3/css3-original.svg" height="30" alt="css3 logo"  />
-  <img width="12" />
-  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/python/python-original.svg" height="30" alt="python logo"  />
-  <img width="12" />
-  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/git/git-original.svg" height="30" alt="git logo"  />
-  <img width="12" />
-  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/github/github-original.svg" height="30" alt="github logo"  />
-  <img width="12" />
-  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/gitlab/gitlab-original.svg" height="30" alt="gitlab logo"  />
-  <img width="12" />
-  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/html5/html5-original.svg" height="30" alt="html5 logo"  />
-  <img width="12" />
-  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/javascript/javascript-original.svg" height="30" alt="javascript logo"  />
-  <img width="12" />
-  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nodejs/nodejs-original.svg" height="30" alt="nodejs logo"  />
+<div align="center">
+
+<!-- Animated header banner -->
+![Header](https://capsule-render.vercel.app/api?type=waving&color=gradient&customColorList=6,11,20&height=200&section=header&text=Chica's%20AI&fontSize=60&fontColor=ff1a1a&animation=fadeIn&fontAlignY=38&desc=Building%20in%20silence.%20Shipping%20with%20fire.&descAlignY=60&descSize=16)
+
+<!-- Profile views badge -->
+![Profile Views](https://komarev.com/ghpvc/?username=ChicaAI&color=ff1a1a&style=flat-square&label=PROFILE+VIEWS)
+
 </div>
 
-###
+---
 
-<p align="left">🚀 Chica's AI<br><br>A free AI-powered web app built with Puter.js — no API keys, no sign-ups, no cost.<br><br>✨ Features<br>- 🤖 **Claude Sonnet 4.0** — Free, unlimited AI chat<br>- ⚡ **GPT-5-nano** — Fast AI responses<br>- ✨ **Streaming** — Watch responses appear in real-time<br>- 🗄️ **Cloud Storage** — Save files to Puter cloud<br>- 🔑 **Key-Value Store** — Persistent user preferences<br><br>🚀 Live Demo<br>[Click here to try Chica's AI](https://chicaai.github.io/Chica-s-AI/)<br><br>🛠️ Built With<br>- [Puter.js](https://puter.com) — Free AI + Cloud platform<br>- HTML/CSS/JavaScript — No frameworks needed<br>- GitHub Pages — Free hosting<br><br> How It Works<br>No backend, no API keys. Puter.js handles<br>all AI and cloud storage directly in the browser.<br><br>📬 Contact<br>Made by Chica 💜</p>
+<div align="center">
 
-###
+## 🚀 Tech Stack I'm Learning
 
-<div align="left">
-  <img src="https://img.shields.io/static/v1?message=Twitch&logo=twitch&label=&color=9146FF&logoColor=white&labelColor=&style=for-the-badge" height="35" alt="twitch logo"  />
-  <img src="https://img.shields.io/static/v1?message=Discord&logo=discord&label=&color=7289DA&logoColor=white&labelColor=&style=for-the-badge" height="35" alt="discord logo"  />
+![HTML5](https://img.shields.io/badge/HTML5-E34F26?style=for-the-badge&logo=html5&logoColor=white)
+![CSS3](https://img.shields.io/badge/CSS3-1572B6?style=for-the-badge&logo=css3&logoColor=white)
+![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)
+![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
+![Node.js](https://img.shields.io/badge/Node.js-43853D?style=for-the-badge&logo=node.js&logoColor=white)
+![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)
+
 </div>
-Website still in work!
+
+---
+
+<div align="center">
+
+## 🌐 Featured Project
+
+</div>
+
+### ✨ Chica's AI — Powered by Puter.js
+
+> A free AI-powered web app — no API keys, no sign-ups, no cost.
+
+**Features:**
+- 🤖 **Claude Sonnet 4** — Free, unlimited AI chat
+- ⚡ **GPT-4o Mini** — Fast AI responses
+- ✨ **Streaming** — Watch responses appear in real-time
+- 📁 **Cloud Storage** — Save files to Puter cloud
+- 🔑 **Key-Value Store** — Persistent user preferences
+
+**Built With:**
+- [Puter.js](https://puter.com) — Free AI + Cloud platform
+- HTML / CSS / JavaScript — No frameworks needed
+- GitHub Pages — Free hosting
+
+🔗 **[Live Demo → chicaai.github.io/Chica-s-AI](https://chicaai.github.io/Chica-s-AI/)**
+
+---
+
+<div align="center">
+
+## 📬 Contact
+
+Made with 💜 by **Chica**
+
+[![Twitch](https://img.shields.io/badge/Twitch-9146FF?style=for-the-badge&logo=twitch&logoColor=white)](https://twitch.tv/xchica999)
+[![Discord](https://img.shields.io/badge/Discord-5865F2?style=for-the-badge&logo=discord&logoColor=white)](https://discord.gg/xChica999)
+
+---
+
+*Website still in work!* 🚧
+
+<!-- Footer wave -->
+![Footer](https://capsule-render.vercel.app/api?type=waving&color=gradient&customColorList=6,11,20&height=100&section=footer)
+
+</div>
