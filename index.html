@@ -1,71 +1,776 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Chica's AI</title>
-</head>
-<body style="font-family:Arial;background:#0d0d0d;color:#ffffff;padding:20px">
-<h1>🚀 Chica's AI - Powered by Puter.js</h1>
-
-<h3>🤖 AI Chat</h3>
-<button onclick="gptChat()">GPT-5-nano</button>
-<button onclick="claudeChat()">Claude Sonnet 4</button>
-
-<h3>✨ Streaming Essay</h3>
-<button onclick="streamEssay()">Stream Long Response</button>
-
-<h3>🗄️ Cloud Files</h3>
-<button onclick="writeFile()">Write File</button>
-<button onclick="readFile()">Read File</button>
-
-<h3>🔑 Key-Value Store</h3>
-<button onclick="setKV()">Set Preference</button>
-<button onclick="getKV()">Get Preference</button>
-
-<div id="output" style="white-space:pre-wrap;border:1px solid #444;padding:10px;max-height:400px;overflow:auto;background:#1a1a1a;color:#00ff88">
 <script src="https://js.puter.com/v2/"></script>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --red: #ff1a1a;
+    --red-dim: #cc0000;
+    --red-glow: rgba(255,26,26,0.4);
+    --bg: #000000;
+    --bg2: #0a0a0a;
+    --bg3: #111111;
+    --border: rgba(255,26,26,0.25);
+    --text: #e0e0e0;
+    --text-dim: #888;
+    --green: #00ff88;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Share Tech Mono', monospace;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Animated grid background */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(255,26,26,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,26,26,0.04) 1px, transparent 1px);
+    background-size: 40px 40px;
+    animation: gridScroll 20s linear infinite;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  @keyframes gridScroll {
+    0% { background-position: 0 0; }
+    100% { background-position: 40px 40px; }
+  }
+
+  /* Scan line overlay */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0,0,0,0.15) 2px,
+      rgba(0,0,0,0.15) 4px
+    );
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  .container {
+    position: relative;
+    z-index: 2;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 40px 24px;
+  }
+
+  /* Header */
+  .header {
+    text-align: center;
+    margin-bottom: 50px;
+    animation: fadeDown 0.8s ease forwards;
+  }
+
+  .header h1 {
+    font-family: 'Orbitron', sans-serif;
+    font-size: clamp(28px, 5vw, 52px);
+    font-weight: 900;
+    color: var(--red);
+    text-shadow:
+      0 0 10px var(--red),
+      0 0 30px var(--red-glow),
+      0 0 60px rgba(255,26,26,0.2);
+    animation: titlePulse 3s ease-in-out infinite, fadeDown 0.8s ease forwards;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+  }
+
+  .header .tagline {
+    color: var(--text-dim);
+    font-size: 12px;
+    letter-spacing: 6px;
+    margin-top: 8px;
+    text-transform: uppercase;
+    animation: fadeIn 1.2s ease forwards;
+    opacity: 0;
+    animation-delay: 0.4s;
+    animation-fill-mode: forwards;
+  }
+
+  @keyframes titlePulse {
+    0%, 100% { text-shadow: 0 0 10px var(--red), 0 0 30px var(--red-glow), 0 0 60px rgba(255,26,26,0.2); }
+    50% { text-shadow: 0 0 20px var(--red), 0 0 50px var(--red-glow), 0 0 100px rgba(255,26,26,0.35); }
+  }
+
+  @keyframes fadeDown {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  /* Divider */
+  .divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--red), transparent);
+    margin: 20px 0 40px;
+    animation: glow 2s ease-in-out infinite;
+  }
+
+  @keyframes glow {
+    0%, 100% { opacity: 0.5; }
+    50% { opacity: 1; box-shadow: 0 0 8px var(--red); }
+  }
+
+  /* Section titles */
+  .section-title {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--red);
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    animation: slideIn 0.6s ease forwards;
+    opacity: 0;
+  }
+
+  .section-title::before {
+    content: '';
+    display: inline-block;
+    width: 3px;
+    height: 16px;
+    background: var(--red);
+    box-shadow: 0 0 8px var(--red);
+    animation: barPulse 1.5s ease-in-out infinite;
+  }
+
+  @keyframes barPulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateX(-16px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+
+  /* Cards */
+  .card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    padding: 24px;
+    margin-bottom: 32px;
+    position: relative;
+    transition: border-color 0.3s;
+    animation: fadeIn 0.6s ease forwards;
+    opacity: 0;
+  }
+
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 60px; height: 1px;
+    background: var(--red);
+    box-shadow: 0 0 6px var(--red);
+  }
+
+  .card:hover {
+    border-color: rgba(255,26,26,0.5);
+    box-shadow: 0 0 20px rgba(255,26,26,0.08);
+  }
+
+  /* Model selector */
+  .model-tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 18px;
+    flex-wrap: wrap;
+  }
+
+  .model-tab {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 2px;
+    padding: 8px 16px;
+    cursor: pointer;
+    text-transform: uppercase;
+    transition: all 0.2s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .model-tab::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--red);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.2s;
+    z-index: -1;
+  }
+
+  .model-tab.active {
+    color: #fff;
+    border-color: var(--red);
+    background: rgba(255,26,26,0.15);
+    text-shadow: 0 0 8px rgba(255,255,255,0.5);
+  }
+
+  .model-tab:hover:not(.active) {
+    border-color: rgba(255,26,26,0.5);
+    color: var(--text);
+  }
+
+  /* Input area */
+  .input-wrapper {
+    position: relative;
+    margin-bottom: 14px;
+  }
+
+  .input-wrapper::before {
+    content: '>';
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--red);
+    font-size: 14px;
+    pointer-events: none;
+    animation: blink 1.2s step-end infinite;
+  }
+
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+  }
+
+  .chat-input {
+    width: 100%;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 13px;
+    padding: 14px 14px 14px 36px;
+    resize: vertical;
+    min-height: 80px;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+
+  .chat-input:focus {
+    border-color: var(--red-dim);
+    box-shadow: 0 0 12px rgba(255,26,26,0.15), inset 0 0 8px rgba(255,26,26,0.05);
+  }
+
+  .chat-input::placeholder { color: var(--text-dim); }
+
+  /* Buttons */
+  .btn-row {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .btn {
+    background: transparent;
+    border: 1px solid var(--red);
+    color: var(--red);
+    font-family: 'Orbitron', sans-serif;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    padding: 10px 20px;
+    cursor: pointer;
+    text-transform: uppercase;
+    transition: all 0.2s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .btn::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--red);
+    opacity: 0;
+    transition: opacity 0.2s;
+    z-index: -1;
+  }
+
+  .btn:hover {
+    color: #fff;
+    background: rgba(255,26,26,0.2);
+    box-shadow: 0 0 16px rgba(255,26,26,0.4);
+  }
+
+  .btn:active { transform: scale(0.97); }
+
+  .btn.secondary {
+    border-color: rgba(255,26,26,0.4);
+    color: var(--text-dim);
+    font-size: 10px;
+  }
+
+  .btn.secondary:hover {
+    border-color: var(--red);
+    color: var(--text);
+  }
+
+  /* Output terminal */
+  .output {
+    margin-top: 18px;
+    background: var(--bg3);
+    border: 1px solid rgba(255,26,26,0.15);
+    border-radius: 2px;
+    min-height: 100px;
+    padding: 16px;
+    font-size: 13px;
+    line-height: 1.7;
+    color: var(--green);
+    position: relative;
+    display: none;
+    white-space: pre-wrap;
+  }
+
+  .output.visible { display: block; }
+
+  .output::before {
+    content: 'OUTPUT';
+    position: absolute;
+    top: -9px;
+    left: 12px;
+    background: var(--bg);
+    color: var(--text-dim);
+    font-size: 9px;
+    letter-spacing: 3px;
+    padding: 0 6px;
+  }
+
+  .output .model-label {
+    color: var(--red);
+    font-size: 10px;
+    letter-spacing: 2px;
+    margin-bottom: 10px;
+    display: block;
+  }
+
+  /* Loading animation */
+  .loader {
+    display: none;
+    gap: 6px;
+    align-items: center;
+    margin-top: 14px;
+  }
+
+  .loader.active { display: flex; }
+
+  .loader span {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--red);
+    animation: bounce 0.8s ease-in-out infinite;
+  }
+
+  .loader span:nth-child(2) { animation-delay: 0.15s; }
+  .loader span:nth-child(3) { animation-delay: 0.3s; }
+
+  .loader .loader-text {
+    color: var(--text-dim);
+    font-size: 11px;
+    letter-spacing: 3px;
+    margin-left: 8px;
+    animation: fadeIn 0.4s ease;
+  }
+
+  @keyframes bounce {
+    0%, 100% { transform: translateY(0); opacity: 0.4; }
+    50% { transform: translateY(-6px); opacity: 1; }
+  }
+
+  /* KV inputs */
+  .kv-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+  }
+
+  .kv-input {
+    flex: 1;
+    min-width: 120px;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 12px;
+    padding: 10px 12px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .kv-input:focus { border-color: var(--red-dim); }
+  .kv-input::placeholder { color: var(--text-dim); }
+
+  /* Staggered animation delays */
+  .card:nth-child(1) { animation-delay: 0.2s; }
+  .card:nth-child(2) { animation-delay: 0.4s; }
+  .card:nth-child(3) { animation-delay: 0.6s; }
+  .card:nth-child(4) { animation-delay: 0.8s; }
+
+  .section-title:nth-of-type(1) { animation-delay: 0.15s; }
+  .section-title:nth-of-type(2) { animation-delay: 0.35s; }
+  .section-title:nth-of-type(3) { animation-delay: 0.55s; }
+  .section-title:nth-of-type(4) { animation-delay: 0.75s; }
+
+  /* Footer */
+  .footer {
+    text-align: center;
+    margin-top: 40px;
+    color: var(--text-dim);
+    font-size: 10px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    opacity: 0;
+    animation: fadeIn 1s ease 1.2s forwards;
+  }
+
+  .footer span {
+    color: var(--red);
+    animation: titlePulse 3s ease-in-out infinite;
+    display: inline-block;
+  }
+
+  /* Status badge */
+  .status-dot {
+    width: 6px; height: 6px;
+    background: var(--green);
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 6px;
+    box-shadow: 0 0 8px var(--green);
+    animation: statusPulse 2s ease-in-out infinite;
+  }
+
+  @keyframes statusPulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <div class="header">
+    <h1>Chica's AI</h1>
+    <p class="tagline">Powered by Puter.js &mdash; Neural Interface v2.0</p>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- AI CHAT -->
+  <p class="section-title">AI Chat</p>
+  <div class="card">
+    <div class="model-tabs">
+      <button class="model-tab active" data-model="gpt-4o-mini" onclick="selectModel(this)">GPT-4o Mini</button>
+      <button class="model-tab" data-model="claude-sonnet-4" onclick="selectModel(this)">Claude Sonnet 4</button>
+    </div>
+
+    <div class="input-wrapper">
+      <textarea class="chat-input" id="chatInput" placeholder="Type your question here..." rows="3"></textarea>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn" onclick="sendChat()">Send Message</button>
+      <button class="btn secondary" onclick="clearChat()">Clear</button>
+    </div>
+
+    <div class="loader" id="chatLoader">
+      <span></span><span></span><span></span>
+      <span class="loader-text" id="loaderText">PROCESSING...</span>
+    </div>
+
+    <div class="output" id="chatOutput">
+      <span class="model-label" id="outputLabel"></span>
+      <span id="outputText"></span>
+    </div>
+  </div>
+
+  <!-- STREAMING ESSAY -->
+  <p class="section-title">Streaming Essay</p>
+  <div class="card">
+    <div class="input-wrapper">
+      <textarea class="chat-input" id="streamInput" placeholder="Enter a topic to write an essay about..." rows="2"></textarea>
+    </div>
+    <div class="btn-row">
+      <button class="btn" onclick="streamEssay()">Stream Response</button>
+    </div>
+    <div class="loader" id="streamLoader">
+      <span></span><span></span><span></span>
+      <span class="loader-text">STREAMING...</span>
+    </div>
+    <div class="output" id="streamOutput">
+      <span class="model-label">GPT-4o Mini — STREAM</span>
+      <span id="streamText"></span>
+    </div>
+  </div>
+
+  <!-- CLOUD FILES -->
+  <p class="section-title">Cloud Files</p>
+  <div class="card">
+    <div class="kv-row">
+      <input class="kv-input" id="fileNameInput" placeholder="filename.txt" />
+      <input class="kv-input" id="fileContentInput" placeholder="File content..." />
+    </div>
+    <div class="btn-row">
+      <button class="btn" onclick="writeFile()">Write File</button>
+      <button class="btn secondary" onclick="readFile()">Read File</button>
+    </div>
+    <div class="output" id="fileOutput">
+      <span class="model-label">FILESYSTEM</span>
+      <span id="fileText"></span>
+    </div>
+  </div>
+
+  <!-- KEY-VALUE STORE -->
+  <p class="section-title">Key-Value Store</p>
+  <div class="card">
+    <div class="kv-row">
+      <input class="kv-input" id="kvKey" placeholder="Key" />
+      <input class="kv-input" id="kvValue" placeholder="Value" />
+    </div>
+    <div class="btn-row">
+      <button class="btn" onclick="setKV()">Set</button>
+      <button class="btn secondary" onclick="getKV()">Get</button>
+    </div>
+    <div class="output" id="kvOutput">
+      <span class="model-label">KEY-VALUE STORE</span>
+      <span id="kvText"></span>
+    </div>
+  </div>
+
+  <div class="footer">
+    <span class="status-dot"></span>
+    System Online &mdash; <span>Chica's AI</span> &mdash; All systems nominal
+  </div>
+
+</div>
+
 <script>
-const out = document.getElementById('output');
-function log(text) { out.innerHTML += text + '\\n'; out.scrollTop = out.scrollHeight; }
+  let selectedModel = 'gpt-4o-mini';
 
-async function gptChat() { 
-  log('GPT: ');
-  const resp = await puter.ai.chat('Quantum computing simply', {model:'gpt-5-nano'});
-  log(resp); 
-}
+  // ── Puter detection ──────────────────────────────────────────────────────────
+  function puterReady() {
+    return typeof puter !== 'undefined' && puter?.ai;
+  }
 
-async function claudeChat() { 
-  log('Claude: ');
-  const resp = await puter.ai.chat('Quantum computing simply', {model:'claude-sonnet-4'});
-  log(resp); 
-}
+  function requirePuter(outId, labelId, txtId) {
+    if (puterReady()) return true;
+    const out = document.getElementById(outId);
+    out.classList.add('visible');
+    if (labelId) document.getElementById(labelId).textContent = 'NOT ON PUTER';
+    document.getElementById(txtId).textContent =
+      'Puter.js is not available here.\n\n' +
+      'To use this app:\n' +
+      '1. Go to https://puter.com and sign in (free)\n' +
+      '2. Open the built-in Code Editor\n' +
+      '3. Paste this HTML file there and run it\n\n' +
+      'Puter only works when hosted inside puter.com — not as a local file.';
+    return false;
+  }
 
-async function streamEssay() {
-  log('Streaming essay...');
-  const stream = await puter.ai.chat('Impact of AI on society essay', {model:'claude-sonnet-4', stream:true});
-  for await (const part of stream) log(part.text);
-  log('✅ Stream done!');
-}
+  // ── Model selector ────────────────────────────────────────────────────────────
+  function selectModel(el) {
+    document.querySelectorAll('.model-tab').forEach(t => t.classList.remove('active'));
+    el.classList.add('active');
+    selectedModel = el.dataset.model;
+  }
 
-async function writeFile() { 
-  await puter.fs.write('demo.txt', 'Hello cloud storage!');
-  log('✅ File written to Puter cloud'); 
-}
+  // ── Chat ──────────────────────────────────────────────────────────────────────
+  async function sendChat() {
+    const input = document.getElementById('chatInput').value.trim();
+    if (!input) return;
+    if (!requirePuter('chatOutput', 'outputLabel', 'outputText')) return;
 
-async function readFile() { 
-  const content = await puter.fs.read('demo.txt');
-  log('📖 File: ' + await content.text()); 
-}
+    const loader    = document.getElementById('chatLoader');
+    const loaderTxt = document.getElementById('loaderText');
+    const out       = document.getElementById('chatOutput');
+    const outText   = document.getElementById('outputText');
+    const outLabel  = document.getElementById('outputLabel');
 
-async function setKV() { 
-  await puter.kv.set('theme', 'dark');
-  log('✅ KV set: theme=dark'); 
-}
+    loader.classList.add('active');
+    loaderTxt.textContent = selectedModel.toUpperCase() + ' PROCESSING...';
+    out.classList.remove('visible');
+    outText.textContent = '';
 
-async function getKV() { 
-  const value = await puter.kv.get('theme');
-  log('🔑 Value: ' + value); 
-}
+    try {
+      const modelId = selectedModel === 'claude-sonnet-4' ? 'claude-sonnet-4-5' : 'gpt-4o-mini';
+      const labelName = selectedModel === 'claude-sonnet-4' ? 'Claude Sonnet 4' : 'GPT-4o Mini';
+
+      const response = await puter.ai.chat(input, { model: modelId });
+
+      // Puter returns different shapes — handle all of them
+      let text = '';
+      if (typeof response === 'string') {
+        text = response;
+      } else if (response?.message?.content) {
+        const c = response.message.content;
+        text = Array.isArray(c) ? c.map(b => b.text || '').join('') : String(c);
+      } else if (response?.text) {
+        text = response.text;
+      } else {
+        text = JSON.stringify(response, null, 2);
+      }
+
+      outLabel.textContent = labelName + ' — Response';
+      outText.textContent  = text;
+      out.classList.add('visible');
+    } catch (e) {
+      outLabel.textContent = 'ERROR';
+      outText.textContent  = e.message || String(e);
+      out.classList.add('visible');
+    } finally {
+      loader.classList.remove('active');
+    }
+  }
+
+  // ── Streaming essay ───────────────────────────────────────────────────────────
+  async function streamEssay() {
+    const topic = document.getElementById('streamInput').value.trim() || 'artificial intelligence';
+    if (!requirePuter('streamOutput', null, 'streamText')) return;
+
+    const loader     = document.getElementById('streamLoader');
+    const out        = document.getElementById('streamOutput');
+    const streamText = document.getElementById('streamText');
+
+    loader.classList.add('active');
+    out.classList.remove('visible');
+    streamText.textContent = '';
+
+    try {
+      const response = await puter.ai.chat(
+        `Write a brief, engaging essay about: ${topic}`,
+        { model: 'gpt-4o-mini', stream: true }
+      );
+      out.classList.add('visible');
+      for await (const part of response) {
+        // Puter streaming chunks may be strings or objects
+        if (typeof part === 'string') streamText.textContent += part;
+        else streamText.textContent += part?.text ?? part?.delta?.text ?? '';
+      }
+    } catch (e) {
+      streamText.textContent = 'Stream failed: ' + (e.message || String(e));
+      out.classList.add('visible');
+    } finally {
+      loader.classList.remove('active');
+    }
+  }
+
+  // ── Cloud Files ───────────────────────────────────────────────────────────────
+  async function writeFile() {
+    if (!requirePuter('fileOutput', null, 'fileText')) return;
+    const name    = document.getElementById('fileNameInput').value.trim()    || 'chica-file.txt';
+    const content = document.getElementById('fileContentInput').value.trim() || 'Hello from Chica!';
+    const out = document.getElementById('fileOutput');
+    const txt = document.getElementById('fileText');
+    txt.textContent = 'Writing...'; out.classList.add('visible');
+    try {
+      await puter.fs.write(name, content);
+      txt.textContent = 'File written successfully: ' + name;
+    } catch (e) { txt.textContent = 'Error: ' + (e.message || String(e)); }
+  }
+
+  async function readFile() {
+    if (!requirePuter('fileOutput', null, 'fileText')) return;
+    const name = document.getElementById('fileNameInput').value.trim() || 'chica-file.txt';
+    const out  = document.getElementById('fileOutput');
+    const txt  = document.getElementById('fileText');
+    txt.textContent = 'Reading...'; out.classList.add('visible');
+    try {
+      const blob = await puter.fs.read(name);
+      txt.textContent = 'Content of ' + name + ':\n\n' + await blob.text();
+    } catch (e) { txt.textContent = 'Error: ' + (e.message || String(e)); }
+  }
+
+  // ── Key-Value ─────────────────────────────────────────────────────────────────
+  async function setKV() {
+    if (!requirePuter('kvOutput', null, 'kvText')) return;
+    const k = document.getElementById('kvKey').value.trim();
+    const v = document.getElementById('kvValue').value.trim();
+    const out = document.getElementById('kvOutput');
+    const txt = document.getElementById('kvText');
+    if (!k) { txt.textContent = 'Key is required.'; out.classList.add('visible'); return; }
+    txt.textContent = 'Setting...'; out.classList.add('visible');
+    try {
+      await puter.kv.set(k, v);
+      txt.textContent = 'Set: ' + k + ' = ' + v;
+    } catch (e) { txt.textContent = 'Error: ' + (e.message || String(e)); }
+  }
+
+  async function getKV() {
+    if (!requirePuter('kvOutput', null, 'kvText')) return;
+    const k = document.getElementById('kvKey').value.trim();
+    const out = document.getElementById('kvOutput');
+    const txt = document.getElementById('kvText');
+    if (!k) { txt.textContent = 'Key is required.'; out.classList.add('visible'); return; }
+    txt.textContent = 'Fetching...'; out.classList.add('visible');
+    try {
+      const val = await puter.kv.get(k);
+      txt.textContent = 'Value: ' + (val ?? '(not found)');
+    } catch (e) { txt.textContent = 'Error: ' + (e.message || String(e)); }
+  }
+
+  // ── Helpers ───────────────────────────────────────────────────────────────────
+  function clearChat() {
+    document.getElementById('chatInput').value = '';
+    document.getElementById('chatOutput').classList.remove('visible');
+  }
+
+  document.getElementById('chatInput').addEventListener('keydown', e => {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendChat(); }
+  });
+
+  // Show a one-time banner if puter isn't loaded yet
+  window.addEventListener('load', () => {
+    if (!puterReady()) {
+      const banner = document.createElement('div');
+      banner.style.cssText = `
+        position:fixed; bottom:20px; left:50%; transform:translateX(-50%);
+        background:#0a0a0a; border:1px solid #ff1a1a;
+        color:#ff1a1a; font-family:'Share Tech Mono',monospace;
+        font-size:11px; letter-spacing:2px; padding:12px 24px;
+        z-index:9999; text-align:center; max-width:90vw;
+        box-shadow:0 0 20px rgba(255,26,26,0.3);
+        animation: fadeIn 0.5s ease;
+      `;
+      banner.textContent = 'PUTER NOT DETECTED — Upload this file to puter.com to enable AI features';
+      document.body.appendChild(banner);
+      setTimeout(() => banner.remove(), 8000);
+    }
+  });
 </script>
 </body>
-</html>                                                                            
+</html>
