@@ -47,7 +47,7 @@
 - HTML / CSS / JavaScript — No frameworks needed
 - GitHub Pages — Free hosting
 
-🔗 **[Live Demo →](https://chicaai.github.io/ChicasAI/)**
+🔗 **[Live Demo →(https://chicaai.github.io/ChicasAI/)]**
 
 ---
 
