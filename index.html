@@ -1,776 +1,1228 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Chica's AI</title>
 <script src="https://js.puter.com/v2/"></script>
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Sora:wght@300;400;600;700;800&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --red: #ff1a1a;
-    --red-dim: #cc0000;
-    --red-glow: rgba(255,26,26,0.4);
-    --bg: #000000;
-    --bg2: #0a0a0a;
-    --bg3: #111111;
-    --border: rgba(255,26,26,0.25);
-    --text: #e0e0e0;
-    --text-dim: #888;
-    --green: #00ff88;
-  }
+/* ═══════════════════════════════════════════ VARIABLES & RESET */
+:root {
+  --red:#e8251a; --red-dim:#c41f15; --red-glow:rgba(232,37,26,.3);
+  --red-soft:rgba(232,37,26,.08);
+  --bg:#0c0c0d; --bg2:#131315; --bg3:#1a1a1d; --bg4:#222226;
+  --border:rgba(255,255,255,.07); --border-bright:rgba(232,37,26,.4);
+  --text:#f0f0f2; --text-dim:#5a5a6a; --text-mid:#9898aa;
+  --green:#22d37a; --accent:#e8251a;
+  --sidebar:224px; --radius:12px; --radius-sm:8px;
+  --font:'Inter',system-ui,sans-serif; --font-display:'Sora',system-ui,sans-serif;
+  --transition:.18s ease;
+  --shadow:0 4px 24px rgba(0,0,0,.4);
+}
+[data-theme="light"] {
+  --bg:#f5f5f7; --bg2:#ffffff; --bg3:#ebebed; --bg4:#e0e0e4;
+  --border:rgba(0,0,0,.08); --border-bright:rgba(200,30,20,.35);
+  --text:#0d0d0f; --text-dim:#aaaabc; --text-mid:#666678;
+  --green:#16a35a;
+  --shadow:0 4px 20px rgba(0,0,0,.1);
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--text);font-family:var(--font);min-height:100vh;overflow-x:hidden;transition:background var(--transition),color var(--transition);font-size:14px;line-height:1.6;-webkit-font-smoothing:antialiased;}
 
-  * { margin: 0; padding: 0; box-sizing: border-box; }
+/* Subtle noise texture */
+body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");opacity:.4;pointer-events:none;z-index:0;}
 
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: 'Share Tech Mono', monospace;
-    min-height: 100vh;
-    overflow-x: hidden;
-  }
+/* ═══════════════════════════════════════════ LAYOUT */
+.layout{display:flex;min-height:100vh;position:relative;z-index:2;}
 
-  /* Animated grid background */
-  body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background-image:
-      linear-gradient(rgba(255,26,26,0.04) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(255,26,26,0.04) 1px, transparent 1px);
-    background-size: 40px 40px;
-    animation: gridScroll 20s linear infinite;
-    pointer-events: none;
-    z-index: 0;
-  }
+/* ═══════════════════════════════════════════ SIDEBAR */
+.sidebar{width:var(--sidebar);background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;top:0;left:0;height:100vh;overflow-y:auto;z-index:100;transition:transform var(--transition);}
+.sidebar-logo{padding:22px 20px 16px;border-bottom:1px solid var(--border);}
+.sidebar-logo h2{font-family:var(--font-display);font-size:16px;font-weight:800;color:var(--red);letter-spacing:-0.3px;animation:titlePulse 4s ease-in-out infinite;}
+.sidebar-logo p{font-size:11px;color:var(--text-dim);margin-top:3px;font-weight:400;}
+.sidebar-section{padding:8px 0;}
+.sidebar-label{font-size:10px;font-weight:600;letter-spacing:.5px;color:var(--text-dim);padding:10px 20px 4px;text-transform:uppercase;}
+.nav-item{display:flex;align-items:center;gap:10px;padding:8px 20px;cursor:pointer;font-size:13px;font-weight:500;color:var(--text-mid);transition:all var(--transition);border-radius:0;border-left:2px solid transparent;margin:1px 0;}
+.nav-item:hover{color:var(--text);background:rgba(255,255,255,.04);}
+.nav-item.active{color:var(--red);background:var(--red-soft);border-left-color:var(--red);font-weight:600;}
+.nav-item .icon{font-size:14px;width:18px;text-align:center;flex-shrink:0;}
 
-  @keyframes gridScroll {
-    0% { background-position: 0 0; }
-    100% { background-position: 40px 40px; }
-  }
+/* ═══════════════════════════════════════════ MAIN */
+.main{margin-left:var(--sidebar);flex:1;display:flex;flex-direction:column;}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:14px 28px;background:rgba(19,19,21,.85);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:50;}
+.topbar-title{font-family:var(--font-display);font-size:14px;font-weight:700;color:var(--text);letter-spacing:-0.3px;}
+.topbar-right{display:flex;gap:8px;align-items:center;}
+.icon-btn{background:var(--bg3);border:1px solid var(--border);color:var(--text-mid);width:34px;height:34px;border-radius:var(--radius-sm);cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center;transition:all var(--transition);}
+.icon-btn:hover{border-color:var(--border-bright);color:var(--red);background:var(--red-soft);}
+.status-dot{width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green);animation:pulse 2.5s ease-in-out infinite;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.3;}}
 
-  /* Scan line overlay */
-  body::after {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background: repeating-linear-gradient(
-      0deg,
-      transparent,
-      transparent 2px,
-      rgba(0,0,0,0.15) 2px,
-      rgba(0,0,0,0.15) 4px
-    );
-    pointer-events: none;
-    z-index: 1;
-  }
+/* ═══════════════════════════════════════════ PAGES */
+.page{display:none;padding:32px;animation:fadeIn .25s ease;}
+.page.active{display:block;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:none;}}
+@keyframes titlePulse{0%,100%{opacity:1;}50%{opacity:.7;}}
 
-  .container {
-    position: relative;
-    z-index: 2;
-    max-width: 900px;
-    margin: 0 auto;
-    padding: 40px 24px;
-  }
+/* ═══════════════════════════════════════════ CARDS */
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:24px;margin-bottom:20px;transition:border-color var(--transition),box-shadow var(--transition);box-shadow:var(--shadow);}
+.card:hover{border-color:rgba(232,37,26,.25);box-shadow:0 8px 32px rgba(0,0,0,.5);}
+.section-title{font-family:var(--font-display);font-size:12px;font-weight:700;color:var(--text-mid);letter-spacing:.5px;text-transform:uppercase;margin-bottom:18px;display:flex;align-items:center;gap:8px;}
+.section-title::before{content:'';width:3px;height:12px;background:var(--red);border-radius:2px;flex-shrink:0;}
+.page-header{margin-bottom:28px;}
+.page-header h1{font-family:var(--font-display);font-size:clamp(22px,3vw,32px);font-weight:800;color:var(--text);letter-spacing:-1px;line-height:1.2;}
+.page-header h1 span{color:var(--red);}
+.page-header p{font-size:13px;color:var(--text-mid);margin-top:6px;font-weight:400;}
+.divider{height:1px;background:var(--border);margin:4px 0 28px;}
 
-  /* Header */
-  .header {
-    text-align: center;
-    margin-bottom: 50px;
-    animation: fadeDown 0.8s ease forwards;
-  }
+/* ═══════════════════════════════════════════ INPUTS */
+.input-wrap{position:relative;margin-bottom:6px;}
+textarea.ai-input,input.ai-input{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);font-family:var(--font);font-size:13px;padding:12px 14px;outline:none;transition:border-color var(--transition),box-shadow var(--transition);resize:vertical;line-height:1.6;}
+input.ai-input{resize:none;padding:10px 14px;min-height:unset;}
+textarea.ai-input:focus,input.ai-input:focus{border-color:rgba(232,37,26,.5);box-shadow:0 0 0 3px rgba(232,37,26,.08);}
+textarea.ai-input::placeholder,input.ai-input::placeholder{color:var(--text-dim);}
+.char-counter{font-size:11px;color:var(--text-dim);text-align:right;margin-bottom:10px;}
+.char-counter.warn{color:var(--red);}
 
-  .header h1 {
-    font-family: 'Orbitron', sans-serif;
-    font-size: clamp(28px, 5vw, 52px);
-    font-weight: 900;
-    color: var(--red);
-    text-shadow:
-      0 0 10px var(--red),
-      0 0 30px var(--red-glow),
-      0 0 60px rgba(255,26,26,0.2);
-    animation: titlePulse 3s ease-in-out infinite, fadeDown 0.8s ease forwards;
-    letter-spacing: 4px;
-    text-transform: uppercase;
-  }
+/* ═══════════════════════════════════════════ SELECTS */
+select.ai-select{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);font-family:var(--font);font-size:13px;padding:9px 14px;outline:none;cursor:pointer;}
+select.ai-select:focus{border-color:rgba(232,37,26,.5);}
 
-  .header .tagline {
-    color: var(--text-dim);
-    font-size: 12px;
-    letter-spacing: 6px;
-    margin-top: 8px;
-    text-transform: uppercase;
-    animation: fadeIn 1.2s ease forwards;
-    opacity: 0;
-    animation-delay: 0.4s;
-    animation-fill-mode: forwards;
-  }
+/* ═══════════════════════════════════════════ BUTTONS */
+.btn-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;}
+.btn{background:var(--red);border:none;border-radius:var(--radius-sm);color:#fff;font-family:var(--font);font-size:13px;font-weight:600;padding:10px 20px;cursor:pointer;transition:all var(--transition);letter-spacing:0;}
+.btn:hover{background:var(--red-dim);transform:translateY(-1px);box-shadow:0 4px 16px rgba(232,37,26,.4);}
+.btn:active{transform:translateY(0);box-shadow:none;}
+.btn.secondary{background:var(--bg3);border:1px solid var(--border);color:var(--text-mid);}
+.btn.secondary:hover{background:var(--bg4);border-color:rgba(232,37,26,.3);color:var(--text);transform:translateY(-1px);box-shadow:none;}
+.btn.sm{padding:7px 14px;font-size:12px;}
 
-  @keyframes titlePulse {
-    0%, 100% { text-shadow: 0 0 10px var(--red), 0 0 30px var(--red-glow), 0 0 60px rgba(255,26,26,0.2); }
-    50% { text-shadow: 0 0 20px var(--red), 0 0 50px var(--red-glow), 0 0 100px rgba(255,26,26,0.35); }
-  }
+/* ═══════════════════════════════════════════ MODEL TABS */
+.model-tabs{display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap;}
+.model-tab{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text-mid);font-family:var(--font);font-size:12px;font-weight:500;padding:8px 16px;cursor:pointer;transition:all var(--transition);}
+.model-tab.active{color:#fff;background:var(--red);border-color:var(--red);}
+.model-tab:hover:not(.active){border-color:rgba(232,37,26,.3);color:var(--text);}
 
-  @keyframes fadeDown {
-    from { opacity: 0; transform: translateY(-20px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
+/* ═══════════════════════════════════════════ TONE PILLS */
+.tone-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px;}
+.tone-pill{background:var(--bg3);border:1px solid var(--border);border-radius:20px;color:var(--text-mid);font-family:var(--font);font-size:12px;font-weight:500;padding:5px 14px;cursor:pointer;transition:all var(--transition);}
+.tone-pill.active{color:#fff;background:var(--red);border-color:var(--red);}
+.tone-pill:hover:not(.active){border-color:rgba(232,37,26,.3);color:var(--text);}
 
-  @keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
-  }
+/* ═══════════════════════════════════════════ OUTPUT */
+.output{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);padding:18px;margin-top:16px;font-size:13px;line-height:1.8;color:var(--text);position:relative;display:none;white-space:pre-wrap;word-break:break-word;max-height:500px;overflow-y:auto;}
+.output.visible{display:block;}
+.output-label{font-size:11px;font-weight:600;color:var(--red);margin-bottom:10px;display:block;text-transform:uppercase;letter-spacing:.5px;}
+.output-actions{display:flex;gap:6px;margin-top:12px;}
+.copy-btn{background:var(--bg4);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text-mid);font-family:var(--font);font-size:12px;font-weight:500;padding:6px 14px;cursor:pointer;transition:all var(--transition);}
+.copy-btn:hover{border-color:rgba(34,211,122,.4);color:var(--green);}
+.copy-btn.copied{border-color:var(--green);color:var(--green);}
 
-  /* Divider */
-  .divider {
-    height: 1px;
-    background: linear-gradient(90deg, transparent, var(--red), transparent);
-    margin: 20px 0 40px;
-    animation: glow 2s ease-in-out infinite;
-  }
+/* ═══════════════════════════════════════════ LOADER */
+.loader{display:none;align-items:center;gap:6px;margin-top:14px;}
+.loader.active{display:flex;}
+.loader-dot{width:8px;height:8px;border-radius:50%;background:var(--red);animation:bounce .7s ease-in-out infinite;}
+.loader-dot:nth-child(2){animation-delay:.14s;}
+.loader-dot:nth-child(3){animation-delay:.28s;}
+.loader-txt{color:var(--text-mid);font-size:12px;font-weight:500;margin-left:8px;}
+@keyframes bounce{0%,100%{transform:translateY(0);opacity:.3;}50%{transform:translateY(-5px);opacity:1;}}
 
-  @keyframes glow {
-    0%, 100% { opacity: 0.5; }
-    50% { opacity: 1; box-shadow: 0 0 8px var(--red); }
-  }
+/* ═══════════════════════════════════════════ CHAT HISTORY */
+.chat-history{max-height:380px;overflow-y:auto;margin-bottom:16px;display:flex;flex-direction:column;gap:12px;padding:4px 0;}
+.chat-history:empty::before{content:'No messages yet — start chatting!';color:var(--text-dim);font-size:13px;display:block;padding:24px;text-align:center;}
+.chat-bubble{padding:12px 16px;font-size:13px;line-height:1.7;position:relative;border-radius:var(--radius-sm);}
+.chat-bubble.user{background:var(--red-soft);border:1px solid rgba(232,37,26,.15);color:var(--text);margin-left:40px;}
+.chat-bubble.ai{background:var(--bg3);border:1px solid var(--border);color:var(--text);margin-right:40px;}
+.chat-bubble .bubble-label{font-size:10px;font-weight:700;color:var(--text-mid);margin-bottom:4px;display:block;text-transform:uppercase;letter-spacing:.5px;}
+.chat-bubble.user .bubble-label{color:var(--red);}
+.chat-bubble .bubble-copy{position:absolute;top:10px;right:10px;background:transparent;border:none;color:var(--text-dim);cursor:pointer;font-size:13px;opacity:0;transition:opacity var(--transition);}
+.chat-bubble:hover .bubble-copy{opacity:1;}
 
-  /* Section titles */
-  .section-title {
-    font-family: 'Orbitron', sans-serif;
-    font-size: 13px;
-    font-weight: 700;
-    color: var(--red);
-    letter-spacing: 4px;
-    text-transform: uppercase;
-    margin-bottom: 16px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    animation: slideIn 0.6s ease forwards;
-    opacity: 0;
-  }
+/* ═══════════════════════════════════════════ TABS (multi-chat) */
+.tab-bar{display:flex;gap:6px;margin-bottom:18px;flex-wrap:wrap;align-items:center;}
+.chat-tab{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text-mid);font-family:var(--font);font-size:12px;font-weight:500;padding:7px 16px;cursor:pointer;transition:all var(--transition);}
+.chat-tab.active{background:var(--red-soft);border-color:rgba(232,37,26,.35);color:var(--red);font-weight:600;}
+.chat-tab .close-tab{margin-left:8px;color:var(--text-dim);font-size:11px;}
+.chat-tab .close-tab:hover{color:var(--red);}
+.add-tab-btn{background:var(--bg3);border:1px dashed var(--border);border-radius:var(--radius-sm);color:var(--text-dim);font-size:16px;width:32px;height:32px;cursor:pointer;transition:all var(--transition);display:flex;align-items:center;justify-content:center;}
+.add-tab-btn:hover{border-color:rgba(232,37,26,.4);color:var(--red);}
 
-  .section-title::before {
-    content: '';
-    display: inline-block;
-    width: 3px;
-    height: 16px;
-    background: var(--red);
-    box-shadow: 0 0 8px var(--red);
-    animation: barPulse 1.5s ease-in-out infinite;
-  }
+/* ═══════════════════════════════════════════ PERSONA */
+.persona-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px;margin-bottom:18px;}
+.persona-card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);padding:16px 12px;cursor:pointer;transition:all var(--transition);text-align:center;}
+.persona-card.active{border-color:rgba(232,37,26,.5);background:var(--red-soft);}
+.persona-card:hover:not(.active){border-color:rgba(255,255,255,.15);transform:translateY(-2px);}
+.persona-card .p-icon{font-size:24px;margin-bottom:8px;}
+.persona-card .p-name{font-size:12px;font-weight:600;color:var(--text);}
+.persona-card .p-desc{font-size:11px;color:var(--text-mid);margin-top:3px;}
 
-  @keyframes barPulse {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.4; }
-  }
+/* ═══════════════════════════════════════════ IMAGE GRID */
+.img-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin-top:16px;}
+.img-card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);overflow:hidden;position:relative;}
+.img-card img{width:100%;display:block;}
+.img-card .img-dl{position:absolute;bottom:10px;right:10px;background:rgba(0,0,0,.75);border-radius:6px;border:1px solid rgba(255,255,255,.15);color:#fff;font-size:11px;font-weight:600;padding:5px 10px;cursor:pointer;}
 
-  @keyframes slideIn {
-    from { opacity: 0; transform: translateX(-16px); }
-    to { opacity: 1; transform: translateX(0); }
-  }
+/* ═══════════════════════════════════════════ FLASHCARDS */
+.flashcard-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px;margin-top:16px;}
+.flashcard{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);padding:18px;cursor:pointer;transition:all var(--transition);min-height:110px;position:relative;}
+.flashcard:hover{border-color:rgba(232,37,26,.3);transform:translateY(-2px);}
+.flashcard .fc-q{font-size:13px;font-weight:500;color:var(--text);margin-bottom:8px;}
+.flashcard .fc-a{font-size:13px;color:var(--green);display:none;}
+.flashcard.flipped .fc-q{display:none;}
+.flashcard.flipped .fc-a{display:block;}
+.flashcard .fc-hint{font-size:10px;color:var(--text-dim);position:absolute;bottom:10px;right:12px;}
 
-  /* Cards */
-  .card {
-    background: var(--bg2);
-    border: 1px solid var(--border);
-    border-radius: 2px;
-    padding: 24px;
-    margin-bottom: 32px;
-    position: relative;
-    transition: border-color 0.3s;
-    animation: fadeIn 0.6s ease forwards;
-    opacity: 0;
-  }
+/* ═══════════════════════════════════════════ VOICE */
+.voice-btn{width:64px;height:64px;border-radius:50%;background:var(--bg3);border:2px solid var(--border);color:var(--text-mid);font-size:24px;cursor:pointer;transition:all var(--transition);display:flex;align-items:center;justify-content:center;margin:0 auto 14px;}
+.voice-btn:hover{border-color:var(--red);color:var(--red);}
+.voice-btn.recording{background:var(--red-soft);border-color:var(--red);color:var(--red);box-shadow:0 0 0 8px rgba(232,37,26,.08),0 0 0 16px rgba(232,37,26,.04);animation:voicePulse 1.2s ease-in-out infinite;}
+@keyframes voicePulse{0%,100%{box-shadow:0 0 0 8px rgba(232,37,26,.08),0 0 0 16px rgba(232,37,26,.04);}50%{box-shadow:0 0 0 12px rgba(232,37,26,.12),0 0 0 24px rgba(232,37,26,.06);}}
+.voice-status{text-align:center;font-size:13px;font-weight:500;color:var(--text-mid);}
 
-  .card::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0;
-    width: 60px; height: 1px;
-    background: var(--red);
-    box-shadow: 0 0 6px var(--red);
-  }
+/* ═══════════════════════════════════════════ PROGRESS BAR */
+.progress-row{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
+.progress-bar{flex:1;height:4px;background:var(--bg4);border-radius:4px;overflow:hidden;}
+.progress-fill{height:100%;background:var(--red);border-radius:4px;transition:width .3s ease;}
 
-  .card:hover {
-    border-color: rgba(255,26,26,0.5);
-    box-shadow: 0 0 20px rgba(255,26,26,0.08);
-  }
+/* ═══════════════════════════════════════════ KV/FILE INPUTS */
+.kv-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;}
+.kv-input{flex:1;min-width:110px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);font-family:var(--font);font-size:13px;padding:10px 14px;outline:none;transition:border-color var(--transition);}
+.kv-input:focus{border-color:rgba(232,37,26,.5);box-shadow:0 0 0 3px rgba(232,37,26,.08);}
+.kv-input::placeholder{color:var(--text-dim);}
 
-  /* Model selector */
-  .model-tabs {
-    display: flex;
-    gap: 8px;
-    margin-bottom: 18px;
-    flex-wrap: wrap;
-  }
+/* ═══════════════════════════════════════════ TOAST */
+.toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);font-family:var(--font);font-size:13px;font-weight:500;padding:12px 24px;z-index:9999;opacity:0;transition:all .25s ease;pointer-events:none;box-shadow:var(--shadow);}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
 
-  .model-tab {
-    background: transparent;
-    border: 1px solid var(--border);
-    color: var(--text-dim);
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 11px;
-    letter-spacing: 2px;
-    padding: 8px 16px;
-    cursor: pointer;
-    text-transform: uppercase;
-    transition: all 0.2s;
-    position: relative;
-    overflow: hidden;
-  }
+/* ═══════════════════════════════════════════ PUTER NOTICE */
+.puter-notice{background:var(--red-soft);border:1px solid rgba(232,37,26,.25);border-radius:var(--radius-sm);padding:14px 18px;margin-bottom:20px;font-size:13px;color:var(--text-mid);line-height:1.8;display:none;}
+.puter-notice.visible{display:block;}
+.puter-notice strong{color:var(--red);font-weight:600;}
 
-  .model-tab::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: var(--red);
-    transform: scaleX(0);
-    transform-origin: left;
-    transition: transform 0.2s;
-    z-index: -1;
-  }
+/* ═══════════════════════════════════════════ SCROLLBAR */
+::-webkit-scrollbar{width:4px;height:4px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--bg4);border-radius:4px;}
+::-webkit-scrollbar-thumb:hover{background:rgba(232,37,26,.4);}
 
-  .model-tab.active {
-    color: #fff;
-    border-color: var(--red);
-    background: rgba(255,26,26,0.15);
-    text-shadow: 0 0 8px rgba(255,255,255,0.5);
-  }
-
-  .model-tab:hover:not(.active) {
-    border-color: rgba(255,26,26,0.5);
-    color: var(--text);
-  }
-
-  /* Input area */
-  .input-wrapper {
-    position: relative;
-    margin-bottom: 14px;
-  }
-
-  .input-wrapper::before {
-    content: '>';
-    position: absolute;
-    left: 14px;
-    top: 50%;
-    transform: translateY(-50%);
-    color: var(--red);
-    font-size: 14px;
-    pointer-events: none;
-    animation: blink 1.2s step-end infinite;
-  }
-
-  @keyframes blink {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0; }
-  }
-
-  .chat-input {
-    width: 100%;
-    background: var(--bg3);
-    border: 1px solid var(--border);
-    color: var(--text);
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 13px;
-    padding: 14px 14px 14px 36px;
-    resize: vertical;
-    min-height: 80px;
-    outline: none;
-    transition: border-color 0.2s, box-shadow 0.2s;
-  }
-
-  .chat-input:focus {
-    border-color: var(--red-dim);
-    box-shadow: 0 0 12px rgba(255,26,26,0.15), inset 0 0 8px rgba(255,26,26,0.05);
-  }
-
-  .chat-input::placeholder { color: var(--text-dim); }
-
-  /* Buttons */
-  .btn-row {
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
-  }
-
-  .btn {
-    background: transparent;
-    border: 1px solid var(--red);
-    color: var(--red);
-    font-family: 'Orbitron', sans-serif;
-    font-size: 10px;
-    font-weight: 700;
-    letter-spacing: 2px;
-    padding: 10px 20px;
-    cursor: pointer;
-    text-transform: uppercase;
-    transition: all 0.2s;
-    position: relative;
-    overflow: hidden;
-  }
-
-  .btn::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: var(--red);
-    opacity: 0;
-    transition: opacity 0.2s;
-    z-index: -1;
-  }
-
-  .btn:hover {
-    color: #fff;
-    background: rgba(255,26,26,0.2);
-    box-shadow: 0 0 16px rgba(255,26,26,0.4);
-  }
-
-  .btn:active { transform: scale(0.97); }
-
-  .btn.secondary {
-    border-color: rgba(255,26,26,0.4);
-    color: var(--text-dim);
-    font-size: 10px;
-  }
-
-  .btn.secondary:hover {
-    border-color: var(--red);
-    color: var(--text);
-  }
-
-  /* Output terminal */
-  .output {
-    margin-top: 18px;
-    background: var(--bg3);
-    border: 1px solid rgba(255,26,26,0.15);
-    border-radius: 2px;
-    min-height: 100px;
-    padding: 16px;
-    font-size: 13px;
-    line-height: 1.7;
-    color: var(--green);
-    position: relative;
-    display: none;
-    white-space: pre-wrap;
-  }
-
-  .output.visible { display: block; }
-
-  .output::before {
-    content: 'OUTPUT';
-    position: absolute;
-    top: -9px;
-    left: 12px;
-    background: var(--bg);
-    color: var(--text-dim);
-    font-size: 9px;
-    letter-spacing: 3px;
-    padding: 0 6px;
-  }
-
-  .output .model-label {
-    color: var(--red);
-    font-size: 10px;
-    letter-spacing: 2px;
-    margin-bottom: 10px;
-    display: block;
-  }
-
-  /* Loading animation */
-  .loader {
-    display: none;
-    gap: 6px;
-    align-items: center;
-    margin-top: 14px;
-  }
-
-  .loader.active { display: flex; }
-
-  .loader span {
-    width: 6px; height: 6px;
-    border-radius: 50%;
-    background: var(--red);
-    animation: bounce 0.8s ease-in-out infinite;
-  }
-
-  .loader span:nth-child(2) { animation-delay: 0.15s; }
-  .loader span:nth-child(3) { animation-delay: 0.3s; }
-
-  .loader .loader-text {
-    color: var(--text-dim);
-    font-size: 11px;
-    letter-spacing: 3px;
-    margin-left: 8px;
-    animation: fadeIn 0.4s ease;
-  }
-
-  @keyframes bounce {
-    0%, 100% { transform: translateY(0); opacity: 0.4; }
-    50% { transform: translateY(-6px); opacity: 1; }
-  }
-
-  /* KV inputs */
-  .kv-row {
-    display: flex;
-    gap: 8px;
-    margin-bottom: 12px;
-    flex-wrap: wrap;
-  }
-
-  .kv-input {
-    flex: 1;
-    min-width: 120px;
-    background: var(--bg3);
-    border: 1px solid var(--border);
-    color: var(--text);
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 12px;
-    padding: 10px 12px;
-    outline: none;
-    transition: border-color 0.2s;
-  }
-
-  .kv-input:focus { border-color: var(--red-dim); }
-  .kv-input::placeholder { color: var(--text-dim); }
-
-  /* Staggered animation delays */
-  .card:nth-child(1) { animation-delay: 0.2s; }
-  .card:nth-child(2) { animation-delay: 0.4s; }
-  .card:nth-child(3) { animation-delay: 0.6s; }
-  .card:nth-child(4) { animation-delay: 0.8s; }
-
-  .section-title:nth-of-type(1) { animation-delay: 0.15s; }
-  .section-title:nth-of-type(2) { animation-delay: 0.35s; }
-  .section-title:nth-of-type(3) { animation-delay: 0.55s; }
-  .section-title:nth-of-type(4) { animation-delay: 0.75s; }
-
-  /* Footer */
-  .footer {
-    text-align: center;
-    margin-top: 40px;
-    color: var(--text-dim);
-    font-size: 10px;
-    letter-spacing: 4px;
-    text-transform: uppercase;
-    opacity: 0;
-    animation: fadeIn 1s ease 1.2s forwards;
-  }
-
-  .footer span {
-    color: var(--red);
-    animation: titlePulse 3s ease-in-out infinite;
-    display: inline-block;
-  }
-
-  /* Status badge */
-  .status-dot {
-    width: 6px; height: 6px;
-    background: var(--green);
-    border-radius: 50%;
-    display: inline-block;
-    margin-right: 6px;
-    box-shadow: 0 0 8px var(--green);
-    animation: statusPulse 2s ease-in-out infinite;
-  }
-
-  @keyframes statusPulse {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.3; }
-  }
+/* ═══════════════════════════════════════════ RESPONSIVE */
+@media(max-width:680px){
+  .sidebar{transform:translateX(-100%);width:220px;}
+  .sidebar.open{transform:none;}
+  .main{margin-left:0;}
+  .hamburger{display:flex!important;}
+}
+.hamburger{display:none;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text-mid);width:34px;height:34px;cursor:pointer;font-size:16px;align-items:center;justify-content:center;}
 </style>
 </head>
 <body>
 
-<div class="container">
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
 
-  <div class="header">
-    <h1>Chica's AI</h1>
-    <p class="tagline">Powered by Puter.js &mdash; Neural Interface v2.0</p>
+<div class="layout">
+
+<!-- ══════════════════════ SIDEBAR -->
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-logo">
+    <h2>Chica's AI</h2>
+    <p>Powered by Puter.js</p>
   </div>
 
-  <div class="divider"></div>
-
-  <!-- AI CHAT -->
-  <p class="section-title">AI Chat</p>
-  <div class="card">
-    <div class="model-tabs">
-      <button class="model-tab active" data-model="gpt-4o-mini" onclick="selectModel(this)">GPT-4o Mini</button>
-      <button class="model-tab" data-model="claude-sonnet-4" onclick="selectModel(this)">Claude Sonnet 4</button>
-    </div>
-
-    <div class="input-wrapper">
-      <textarea class="chat-input" id="chatInput" placeholder="Type your question here..." rows="3"></textarea>
-    </div>
-
-    <div class="btn-row">
-      <button class="btn" onclick="sendChat()">Send Message</button>
-      <button class="btn secondary" onclick="clearChat()">Clear</button>
-    </div>
-
-    <div class="loader" id="chatLoader">
-      <span></span><span></span><span></span>
-      <span class="loader-text" id="loaderText">PROCESSING...</span>
-    </div>
-
-    <div class="output" id="chatOutput">
-      <span class="model-label" id="outputLabel"></span>
-      <span id="outputText"></span>
-    </div>
+  <div class="sidebar-section">
+    <div class="sidebar-label">Core</div>
+    <div class="nav-item active" onclick="showPage('chat')" data-page="chat"><span class="icon">💬</span>AI Chat</div>
+    <div class="nav-item" onclick="showPage('image')" data-page="image"><span class="icon">🖼</span>Image Gen</div>
+    <div class="nav-item" onclick="showPage('stream')" data-page="stream"><span class="icon">⚡</span>Streaming</div>
+    <div class="nav-item" onclick="showPage('voice')" data-page="voice"><span class="icon">🎙</span>Voice Input</div>
   </div>
 
-  <!-- STREAMING ESSAY -->
-  <p class="section-title">Streaming Essay</p>
-  <div class="card">
-    <div class="input-wrapper">
-      <textarea class="chat-input" id="streamInput" placeholder="Enter a topic to write an essay about..." rows="2"></textarea>
-    </div>
-    <div class="btn-row">
-      <button class="btn" onclick="streamEssay()">Stream Response</button>
-    </div>
-    <div class="loader" id="streamLoader">
-      <span></span><span></span><span></span>
-      <span class="loader-text">STREAMING...</span>
-    </div>
-    <div class="output" id="streamOutput">
-      <span class="model-label">GPT-4o Mini — STREAM</span>
-      <span id="streamText"></span>
-    </div>
+  <div class="sidebar-section">
+    <div class="sidebar-label">Writing</div>
+    <div class="nav-item" onclick="showPage('summarizer')" data-page="summarizer"><span class="icon">📄</span>Summarizer</div>
+    <div class="nav-item" onclick="showPage('email')" data-page="email"><span class="icon">📧</span>Email Writer</div>
+    <div class="nav-item" onclick="showPage('resume')" data-page="resume"><span class="icon">📋</span>Resume Rewriter</div>
+    <div class="nav-item" onclick="showPage('coverletter')" data-page="coverletter"><span class="icon">✉</span>Cover Letter</div>
+    <div class="nav-item" onclick="showPage('essay')" data-page="essay"><span class="icon">📝</span>Essay Grader</div>
+    <div class="nav-item" onclick="showPage('translator')" data-page="translator"><span class="icon">🌐</span>Translator</div>
+    <div class="nav-item" onclick="showPage('flashcards')" data-page="flashcards"><span class="icon">🃏</span>Flashcards</div>
   </div>
 
-  <!-- CLOUD FILES -->
-  <p class="section-title">Cloud Files</p>
-  <div class="card">
-    <div class="kv-row">
-      <input class="kv-input" id="fileNameInput" placeholder="filename.txt" />
-      <input class="kv-input" id="fileContentInput" placeholder="File content..." />
-    </div>
-    <div class="btn-row">
-      <button class="btn" onclick="writeFile()">Write File</button>
-      <button class="btn secondary" onclick="readFile()">Read File</button>
-    </div>
-    <div class="output" id="fileOutput">
-      <span class="model-label">FILESYSTEM</span>
-      <span id="fileText"></span>
-    </div>
+  <div class="sidebar-section">
+    <div class="sidebar-label">Code</div>
+    <div class="nav-item" onclick="showPage('explainer')" data-page="explainer"><span class="icon">🔍</span>Code Explainer</div>
+    <div class="nav-item" onclick="showPage('bugfixer')" data-page="bugfixer"><span class="icon">🐛</span>Bug Fixer</div>
+    <div class="nav-item" onclick="showPage('commenter')" data-page="commenter"><span class="icon">💬</span>Comment Writer</div>
+    <div class="nav-item" onclick="showPage('readme')" data-page="readme"><span class="icon">📚</span>README Gen</div>
+    <div class="nav-item" onclick="showPage('apidocs')" data-page="apidocs"><span class="icon">📖</span>API Docs</div>
+    <div class="nav-item" onclick="showPage('changelog')" data-page="changelog"><span class="icon">📋</span>Changelog</div>
+    <div class="nav-item" onclick="showPage('commit')" data-page="commit"><span class="icon">🔀</span>Git Commit</div>
+    <div class="nav-item" onclick="showPage('terminal')" data-page="terminal"><span class="icon">⌨</span>Terminal Help</div>
+    <div class="nav-item" onclick="showPage('error')" data-page="error"><span class="icon">🚨</span>Error Decoder</div>
   </div>
 
-  <!-- KEY-VALUE STORE -->
-  <p class="section-title">Key-Value Store</p>
-  <div class="card">
-    <div class="kv-row">
-      <input class="kv-input" id="kvKey" placeholder="Key" />
-      <input class="kv-input" id="kvValue" placeholder="Value" />
+  <div class="sidebar-section">
+    <div class="sidebar-label">Data</div>
+    <div class="nav-item" onclick="showPage('sql')" data-page="sql"><span class="icon">🗄</span>SQL Builder</div>
+    <div class="nav-item" onclick="showPage('json')" data-page="json"><span class="icon">{ }</span>JSON Helper</div>
+    <div class="nav-item" onclick="showPage('csv')" data-page="csv"><span class="icon">📊</span>CSV Analyzer</div>
+    <div class="nav-item" onclick="showPage('apiexplain')" data-page="apiexplain"><span class="icon">🔌</span>API Explainer</div>
+  </div>
+
+  <div class="sidebar-section">
+    <div class="sidebar-label">Storage</div>
+    <div class="nav-item" onclick="showPage('files')" data-page="files"><span class="icon">☁</span>Cloud Files</div>
+    <div class="nav-item" onclick="showPage('kv')" data-page="kv"><span class="icon">🔑</span>Key-Value</div>
+  </div>
+</nav>
+
+<!-- ══════════════════════ MAIN -->
+<div class="main">
+
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div style="display:flex;align-items:center;gap:10px;">
+      <button class="hamburger" id="hamburger" onclick="toggleSidebar()">☰</button>
+      <span class="topbar-title" id="topbar-title">AI CHAT</span>
     </div>
-    <div class="btn-row">
-      <button class="btn" onclick="setKV()">Set</button>
-      <button class="btn secondary" onclick="getKV()">Get</button>
-    </div>
-    <div class="output" id="kvOutput">
-      <span class="model-label">KEY-VALUE STORE</span>
-      <span id="kvText"></span>
+    <div class="topbar-right">
+      <span class="status-dot" title="System Online"></span>
+      <button class="icon-btn" onclick="toggleTheme()" title="Toggle theme" id="themeBtn">☀</button>
+      <button class="icon-btn" onclick="exportChat()" title="Export chat as text">⬇</button>
     </div>
   </div>
 
-  <div class="footer">
-    <span class="status-dot"></span>
-    System Online &mdash; <span>Chica's AI</span> &mdash; All systems nominal
+  <!-- ══ PAGE: AI CHAT -->
+  <div class="page active" id="page-chat">
+    <div class="page-header">
+      <h1>AI <span>Chat</span></h1>
+      <p>Multi-model chat with history, personas, and tone control</p>
+    </div>
+    <div class="divider"></div>
+
+    <div id="puterNotice" class="puter-notice">
+      <strong>PUTER NOT DETECTED</strong> — This app must be hosted on <strong>puter.com</strong> to use AI features.<br>
+      Go to puter.com → sign in free → open Code Editor → paste this file → Run.
+    </div>
+
+    <!-- Personas -->
+    <div class="card">
+      <div class="section-title">AI Persona</div>
+      <div class="persona-grid" id="personaGrid">
+        <div class="persona-card active" onclick="selectPersona(this,'default','You are a helpful, concise assistant.')">
+          <div class="p-icon">🤖</div>
+          <div class="p-name">Default</div>
+          <div class="p-desc">Balanced & helpful</div>
+        </div>
+        <div class="persona-card" onclick="selectPersona(this,'aria','You are Aria, a sharp and direct assistant who gives short punchy answers.')">
+          <div class="p-icon">⚡</div>
+          <div class="p-name">Aria</div>
+          <div class="p-desc">Sharp & direct</div>
+        </div>
+        <div class="persona-card" onclick="selectPersona(this,'sage','You are Sage, a wise and thoughtful teacher who explains things deeply with examples.')">
+          <div class="p-icon">🦉</div>
+          <div class="p-name">Sage</div>
+          <div class="p-desc">Deep & educational</div>
+        </div>
+        <div class="persona-card" onclick="selectPersona(this,'nova','You are Nova, a creative and playful AI who loves humor, metaphors, and unexpected ideas.')">
+          <div class="p-icon">🌟</div>
+          <div class="p-name">Nova</div>
+          <div class="p-desc">Creative & fun</div>
+        </div>
+        <div class="persona-card" onclick="selectPersona(this,'hex','You are Hex, a senior software engineer who gives precise, technical answers with code examples.')">
+          <div class="p-icon">💻</div>
+          <div class="p-name">Hex</div>
+          <div class="p-desc">Dev-focused</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Multi-tab chat -->
+    <div class="card">
+      <div class="section-title">Chat Sessions</div>
+      <div class="tab-bar" id="tabBar">
+        <div class="chat-tab active" data-tab="0" onclick="switchTab(0)">Session 1</div>
+        <button class="add-tab-btn" onclick="addTab()" title="New session">+</button>
+      </div>
+
+      <div class="model-tabs">
+        <button class="model-tab active" data-model="gpt-4o-mini" onclick="selectModel(this)">GPT-4o Mini</button>
+        <button class="model-tab" data-model="claude-sonnet-4-5" onclick="selectModel(this)">Claude Sonnet 4</button>
+      </div>
+
+      <div class="tone-row" id="toneRow">
+        <button class="tone-pill active" data-tone="">Default</button>
+        <button class="tone-pill" data-tone="Respond in a formal, professional tone.">Formal</button>
+        <button class="tone-pill" data-tone="Respond in a funny and witty tone.">Funny</button>
+        <button class="tone-pill" data-tone="Explain everything in simple language a beginner can understand.">Simple</button>
+        <button class="tone-pill" data-tone="Be brutally honest and direct, no fluff.">Direct</button>
+        <button class="tone-pill" data-tone="Respond like a friendly mentor encouraging the user.">Mentor</button>
+      </div>
+
+      <div class="chat-history" id="chatHistory"></div>
+
+      <div class="input-wrap">
+        <textarea class="ai-input" id="chatInput" rows="3" placeholder="Ask anything... (Enter to send, Shift+Enter for new line)"></textarea>
+      </div>
+      <div class="char-counter" id="charCounter">0 / 4000</div>
+
+      <div class="btn-row">
+        <button class="btn" onclick="sendChat()">Send</button>
+        <button class="btn secondary" onclick="clearChat()">Clear History</button>
+        <button class="btn secondary" onclick="exportChat()">Export Chat</button>
+      </div>
+      <div class="loader" id="chatLoader"><div class="loader-dot"></div><div class="loader-dot"></div><div class="loader-dot"></div><span class="loader-txt" id="loaderTxt">PROCESSING...</span></div>
+    </div>
   </div>
 
-</div>
+  <!-- ══ PAGE: IMAGE GEN -->
+  <div class="page" id="page-image">
+    <div class="page-header"><h1>Image Generation</h1><p>Text-to-image via Puter.js AI</p></div>
+    <div class="divider"></div>
+    <div class="card">
+      <div class="section-title">Generate Image</div>
+      <div class="input-wrap"><textarea class="ai-input" id="imgPrompt" rows="3" placeholder="Describe the image you want to create..."></textarea></div>
+      <div class="btn-row">
+        <button class="btn" onclick="generateImage()">Generate</button>
+        <button class="btn secondary" onclick="document.getElementById('imgGrid').innerHTML=''">Clear</button>
+      </div>
+      <div class="loader" id="imgLoader"><div class="loader-dot"></div><div class="loader-dot"></div><div class="loader-dot"></div><span class="loader-txt">GENERATING...</span></div>
+      <div class="img-grid" id="imgGrid"></div>
+    </div>
+  </div>
+
+  <!-- ══ PAGE: STREAMING -->
+  <div class="page" id="page-stream">
+    <div class="page-header"><h1>Streaming Essay</h1><p>Watch the AI write in real time</p></div>
+    <div class="divider"></div>
+    <div class="card">
+      <div class="section-title">Topic</div>
+      <div class="input-wrap"><textarea class="ai-input" id="streamInput" rows="2" placeholder="Enter a topic to write about..."></textarea></div>
+      <div class="btn-row"><button class="btn" onclick="streamEssay()">Stream</button></div>
+      <div class="loader" id="streamLoader"><div class="loader-dot"></div><div class="loader-dot"></div><div class="loader-dot"></div><span class="loader-txt">STREAMING...</span></div>
+      <div class="output" id="streamOutput"><span class="output-label">GPT-4o Mini — LIVE STREAM</span><span id="streamText"></span></div>
+      <div class="output-actions" id="streamActions" style="display:none"><button class="copy-btn" onclick="copyOutput('streamText',this)">Copy</button></div>
+    </div>
+  </div>
+
+  <!-- ══ PAGE: VOICE -->
+  <div class="page" id="page-voice">
+    <div class="page-header"><h1>Voice Input</h1><p>Speak your prompt using your microphone</p></div>
+    <div class="divider"></div>
+    <div class="card">
+      <div class="section-title">Microphone</div>
+      <button class="voice-btn" id="voiceBtn" onclick="toggleVoice()">🎙</button>
+      <div class="voice-status" id="voiceStatus">Click to start recording</div>
+      <div style="margin-top:16px;">
+        <div class="input-wrap"><textarea class="ai-input" id="voiceTranscript" rows="3" placeholder="Transcript will appear here..."></textarea></div>
+        <div class="model-tabs" style="margin-top:10px;">
+          <button class="model-tab active" data-model="gpt-4o-mini" onclick="selectVoiceModel(this)">GPT-4o Mini</button>
+          <button class="model-tab" data-model="claude-sonnet-4-5" onclick="selectVoiceModel(this)">Claude Sonnet 4</button>
+        </div>
+        <div class="btn-row"><button class="btn" onclick="sendVoiceChat()">Send to AI</button></div>
+      </div>
+      <div class="loader" id="voiceLoader"><div class="loader-dot"></div><div class="loader-dot"></div><div class="loader-dot"></div><span class="loader-txt">PROCESSING...</span></div>
+      <div class="output" id="voiceOutput"><span class="output-label" id="voiceLabel"></span><span id="voiceText"></span></div>
+      <div class="output-actions"><button class="copy-btn" onclick="copyOutput('voiceText',this)">Copy</button></div>
+    </div>
+  </div>
+
+  <!-- ══ PAGE: SUMMARIZER -->
+  <div class="page" id="page-summarizer">
+    <div class="page-header"><h1>Text Summarizer</h1><p>Paste any article or text — get a short summary</p></div>
+    <div class="divider"></div>
+    <div class="card">
+      <div class="section-title">Paste Text</div>
+      <div class="input-wrap"><textarea class="ai-input" id="summInput" rows="8" placeholder="Paste a long article, essay, or any text here..."></textarea></div>
+      <div class="btn-row"><button class="btn" onclick="runTool('summInput','summOutput','summLabel','summLoader','Summarize the following text concisely in 3-5 bullet points:\n\n','Summarizer')">Summarize</button></div>
+      <div class="loader" id="summLoader"><div class="loader-dot"></div><div class="loader-dot"></div><div class="loader-dot"></div><span class="loader-txt">SUMMARIZING...</span></div>
+      <div class="output" id="summOutput"><span class="output-label" id="summLabel"></span><span id="summText"></span></div>
+      <div class="output-actions"><button class="copy-btn" onclick="copyOutput('summText',this)">Copy</button></div>
+    </div>
+  </div>
+
+  <!-- ══ PAGE: EMAIL WRITER -->
+  <div class="page" id="page-email">
+    <div class="page-header"><h1>Email Writer</h1><p>Describe what you need to say — AI writes the email</p></div>
+    <div class="divider"></div>
+    <div class="card">
+      <div class="section-title">What do you need to say?</div>
+      <div class="input-wrap"><textarea class="ai-input" id="emailInput" rows="4" placeholder="e.g. Tell my manager I'll be late Monday due to a dentist appointment, keep it professional and short..."></textarea></div>
+      <div class="btn-row"><button class="btn" onclick="runTool('emailInput','emailOutput','emailLabel','emailLoader','Write a professional email based on this description. Include subject line, greeting, body, and sign-off:\n\n','Email Writer')">Write Email</button></div>
+      <div class="loader" id="emailLoader"><div class="loader-dot"></div><div class="loader-dot"></div><div class="loader-dot"></div><span class="loader-txt">WRITING...</span></div>
+      <div class="output" id="emailOutput"><span class="output-label" id="emailLabel"></span><span id="emailText"></span></div>
+      <div class="output-actions"><button class="copy-btn" onclick="copyOutput('emailText',this)">Copy</button></div>
+    </div>
+  </div>
+
+  <!-- ══ PAGE: RESUME REWRITER -->
+  <div class="page" id="page-resume">
+    <div class="page-header"><h1>Resume Rewriter</h1><p>Paste a resume bullet — AI makes it shine</p></div>
+    <div class="divider"></div>
+    <div class="card">
+      <div class="section-title">Resume Bullet Point(s)</div>
+      <div class="input-wrap"><textarea class="ai-input" id="resumeInput" rows="5" placeholder="Paste your resume bullet points here..."></textarea></div>
+      <div class="btn-row"><button class="btn" onclick="runTool('resumeInput','resumeOutput','resumeLabel','resumeLoader','Rewrite these resume bullet points to be stronger, more impactful, and action-oriented using power verbs and quantifiable results where possible:\n\n','Resume Rewriter')">Rewrite</button></div>
+      <div class="loader" id="resumeLoader"><div class="loader-dot"></div><div class="loader-dot"></div><div class="loader-dot"></div><span class="loader-txt">REWRITING...</span></div>
+      <div class="output" id="resumeOutput"><span class="output-label" id="resumeLabel"></span><span id="resumeText"></span></div>
+      <div class="output-actions"><button class="copy-btn" onclick="copyOutput('resumeText',this)">Copy</button></div>
+    </div>
+  </div>
+
+  <!-- ══ PAGE: COVER LETTER -->
+  <div class="page" id="page-coverletter">
+    <div class="page-header"><h1>Cover Letter Generator</h1><p>AI writes job application letters for you</p></div>
+    <div class="divider"></div>
+    <div class="card">
+      <div class="section-title">Job Details</div>
+      <div class="input-wrap"><textarea class="ai-input" id="coverInput" rows="5" placeholder="Describe the job you're applying for, your experience, and any key points to include..."></textarea></div>
+      <div class="btn-row"><button class="btn" onclick="runTool('coverInput','coverOutput','coverLabel','coverLoader','Write a compelling professional cover letter based on the following details:\n\n','Cover Letter')">Generate</button></div>
+      <div class="loader" id="coverLoader"><div class="loader-dot"></div><div class="loader-dot"></div><div class="loader-dot"></div><span class="loader-txt">WRITING...</span></div>
+      <div class="output" id="coverOutput"><span class="output-label" id="coverLabel"></span><span id="coverText"></span></div>
+      <div class="output-actions"><button class="copy-btn" onclick="copyOutput('coverText',this)">Copy</button></div>
+    </div>
+  </div>
+
+  <!-- ══ PAGE: ESSAY GRADER -->
+  <div class="page" id="page-essay">
+    <div class="page-header"><h1>Essay Grader</h1><p>AI scores your writing and gives feedback</p></div>
+    <div class="divider"></div>
+    <div class="card">
+      <div class="section-title">Paste Your Essay</div>
+      <div class="input-wrap"><textarea class="ai-input" id="essayInput" rows="8" placeholder="Paste your essay or writing sample here..."></textarea></div>
+      <div class="btn-row"><button class="btn" onclick="runTool('essayInput','essayOutput','essayLabel','essayLoader','Grade the following essay. Give it a score out of 100, explain strengths and weaknesses, and suggest specific improvements. Be honest and detailed:\n\n','Essay Grader')">Grade Essay</button></div>
+      <div class="loader" id="essayLoader"><div class="loader-dot"></div><div class="loader-dot"></div><div class="loader-dot"></div><span class="loader-txt">GRADING...</span></div>
+      <div class="output" id="essayOutput"><span class="output-label" id="essayLabel"></span><span id="essayText"></span></div>
+      <div class="output-actions"><button class="copy-btn" onclick="copyOutput('essayText',this)">Copy</button></div>
+    </div>
+  </div>
+
+  <!-- ══ PAGE: TRANSLATOR -->
+  <div class="page" id="page-translator">
+    <div class="page-header"><h1>Translator</h1><p>Translate text into any language</p></div>
+    <div class="divider"></div>
+    <div class="card">
+      <div class="section-title">Text & Target Language</div>
+      <div class="input-wrap"><textarea class="ai-input" id="transInput" rows="4" placeholder="Enter text to translate..."></textarea></div>
+      <div style="margin:10px 0;">
+        <select class="ai-select" id="transLang">
+          <option value="Spanish">Spanish</option>
+          <option value="French">French</option>
+          <option value="German">German</option>
+          <option value="Italian">Italian</option>
+          <option value="Portuguese">Portuguese</option>
+          <option value="Japanese">Japanese</option>
+          <option value="Chinese (Simplified)">Chinese (Simplified)</option>
+          <option value="Korean">Korean</option>
+          <option value="Arabic">Arabic</option>
+          <option value="Russian">Russian</option>
+          <option value="Hindi">Hindi</option>
+          <option value="Dutch">Dutch</option>
+          <option value="Polish">Polish</option>
+          <option value="Turkish">Turkish</option>
+          <option value="Swedish">Swedish</option>
+        </select>
+      </div>
+      <div class="btn-row"><button class="btn" onclick="translateText()">Translate</button></div>
+      <div class="loader" id="transLoader"><div class="loader-dot"></div><div class="loader-dot"></div><div class="loader-dot"></div><span class="loader-txt">TRANSLATING...</span></div>
+      <div class="output" id="transOutput"><span class="output-label" id="transLabel"></span><span id="transText"></span></div>
+      <div class="output-actions"><button class="copy-btn" onclick="copyOutput('transText',this)">Copy</button></div>
+    </div>
+  </div>
+
+  <!-- ══ PAGE: FLASHCARDS -->
+  <div class="page" id="page-flashcards">
+    <div class="page-header"><h1>Study Flashcards</h1><p>Paste your notes — AI turns them into Q&A cards</p></div>
+    <div class="divider"></div>
+    <div class="card">
+      <div class="section-title">Paste Your Notes</div>
+      <div class="input-wrap"><textarea class="ai-input" id="flashInput" rows="6" placeholder="Paste your study notes here..."></textarea></div>
+      <div class="btn-row"><button class="btn" onclick="generateFlashcards()">Generate Cards</button></div>
+      <div class="loader" id="flashLoader"><div class="loader-dot"></div><div class="loader-dot"></div><div class="loader-dot"></div><span class="loader-txt">CREATING CARDS...</span></div>
+      <p style="font-size:10px;color:var(--text-dim);letter-spacing:1px;margin-top:12px;">Click a card to reveal the answer</p>
+      <div class="flashcard-grid" id="flashGrid"></div>
+    </div>
+  </div>
+
+  <!-- ══ PAGE: CODE EXPLAINER -->
+  <div class="page" id="page-explainer">
+    <div class="page-header"><h1>Code Explainer</h1><p>Paste code — AI explains exactly what it does</p></div>
+    <div class="divider"></div>
+    <div class="card">
+      <div class="section-title">Paste Code</div>
+      <div class="input-wrap"><textarea class="ai-input" id="explainInput" rows="8" placeholder="Paste any code here..."></textarea></div>
+      <div class="btn-row"><button class="btn" onclick="runTool('explainInput','explainOutput','explainLabel','explainLoader','Explain what this code does in plain English. Be thorough but clear. Point out any issues or notable patterns:\n\n','Code Explainer')">Explain</button></div>
+      <div class="loader" id="explainLoader"><div class="loader-dot"></div><div class="loader-dot"></div><div class="loader-dot"></div><span class="loader-txt">ANALYZING...</span></div>
+      <div class="output" id="explainOutput"><span class="output-label" id="explainLabel"></span><span id="explainText"></span></div>
+      <div class="output-actions"><button class="copy-btn" onclick="copyOutput('explainText',this)">Copy</button></div>
+    </div>
+  </div>
+
+  <!-- ══ PAGE: BUG FIXER -->
+  <div class="page" id="page-bugfixer">
+    <div class="page-header"><h1>Bug Fixer</h1><p>Paste broken code — AI fixes it and explains the issue</p></div>
+    <div class="divider"></div>
+    <div class="card">
+      <div class="section-title">Broken Code</div>
+      <div class="input-wrap"><textarea class="ai-input" id="bugInput" rows="8" placeholder="Paste your broken code here..."></textarea></div>
+      <div class="btn-row"><button class="btn" onclick="runTool('bugInput','bugOutput','bugLabel','bugLoader','Find and fix all bugs in this code. Show the fixed code and explain what was wrong:\n\n','Bug Fixer')">Fix Bugs</button></div>
+      <div class="loader" id="bugLoader"><div class="loader-dot"></div><div class="loader-dot"></div><div class="loader-dot"></div><span class="loader-txt">DEBUGGING...</span></div>
+      <div class="output" id="bugOutput"><span class="output-label" id="bugLabel"></span><span id="bugText"></span></div>
+      <div class="output-actions"><button class="copy-btn" onclick="copyOutput('bugText',this)">Copy</button></div>
+    </div>
+  </div>
+
+  <!-- ══ PAGE: COMMENT WRITER -->
+  <div class="page" id="page-commenter">
+    <div class="page-header"><h1>Comment Writer</h1><p>Paste uncommented code — AI adds proper docs</p></div>
+    <div class="divider"></div>
+    <div class="card">
+      <div class="section-title">Code Without Comments</div>
+      <div class="input-wrap"><textarea class="ai-input" id="commentInput" rows="8" placeholder="Paste uncommented code here..."></textarea></div>
+      <div class="btn-row"><button class="btn" onclick="runTool('commentInput','commentOutput','commentLabel','commentLoader','Add clear, helpful comments and JSDoc/docstring documentation to this code. Return the fully commented code:\n\n','Comment Writer')">Add Comments</button></div>
+      <div class="loader" id="commentLoader"><div class="loader-dot"></div><div class="loader-dot"></div><div class="loader-dot"></div><span class="loader-txt">COMMENTING...</span></div>
+      <div class="output" id="commentOutput"><span class="output-label" id="commentLabel"></span><span id="commentText"></span></div>
+      <div class="output-actions"><button class="copy-btn" onclick="copyOutput('commentText',this)">Copy</button></div>
+    </div>
+  </div>
+
+  <!-- ══ PAGE: README -->
+  <div class="page" id="page-readme">
+    <div class="page-header"><h1>README Generator</h1><p>Describe your project — AI writes a full README.md</p></div>
+    <div class="divider"></div>
+    <div class="card">
+      <div class="section-title">Project Description</div>
+      <div class="input-wrap"><textarea class="ai-input" id="readmeInput" rows="5" placeholder="Describe your project: what it does, tech stack, features..."></textarea></div>
+      <div class="btn-row"><button class="btn" onclick="runTool('readmeInput','readmeOutput','readmeLabel','readmeLoader','Generate a complete, professional README.md file in Markdown for this project. Include badges, installation, usage, features, contributing, and license sections:\n\n','README Generator')">Generate</button></div>
+      <div class="loader" id="readmeLoader"><div class="loader-dot"></div><div class="loader-dot"></div><div class="loader-dot"></div><span class="loader-txt">GENERATING...</span></div>
+      <div class="output" id="readmeOutput"><span class="output-label" id="readmeLabel"></span><span id="readmeText"></span></div>
+      <div class="output-actions"><button class="copy-btn" onclick="copyOutput('readmeText',this)">Copy</button></div>
+    </div>
+  </div>
+
+  <!-- ══ PAGE: API DOCS -->
+  <div class="page" id="page-apidocs">
+    <div class="page-header"><h1>API Docs Generator</h1><p>Paste functions — AI writes documentation</p></div>
+    <div class="divider"></div>
+    <div class="card">
+      <div class="section-title">Paste Functions / Endpoints</div>
+      <div class="input-wrap"><textarea class="ai-input" id="apidocsInput" rows="8" placeholder="Paste your functions, routes, or API endpoints here..."></textarea></div>
+      <div class="btn-row"><button class="btn" onclick="runTool('apidocsInput','apidocsOutput','apidocsLabel','apidocsLoader','Generate clear, professional API documentation for these functions/endpoints. Include parameters, return values, types, and usage examples:\n\n','API Docs')">Generate Docs</button></div>
+      <div class="loader" id="apidocsLoader"><div class="loader-dot"></div><div class="loader-dot"></div><div class="loader-dot"></div><span class="loader-txt">DOCUMENTING...</span></div>
+      <div class="output" id="apidocsOutput"><span class="output-label" id="apidocsLabel"></span><span id="apidocsText"></span></div>
+      <div class="output-actions"><button class="copy-btn" onclick="copyOutput('apidocsText',this)">Copy</button></div>
+    </div>
+  </div>
+
+  <!-- ══ PAGE: CHANGELOG -->
+  <div class="page" id="page-changelog">
+    <div class="page-header"><h1>Changelog Writer</h1><p>Describe your updates — AI formats a proper changelog</p></div>
+    <div class="divider"></div>
+    <div class="card">
+      <div class="section-title">Describe Your Updates</div>
+      <div class="input-wrap"><textarea class="ai-input" id="changelogInput" rows="5" placeholder="List the changes you made to your project..."></textarea></div>
+      <div class="btn-row"><button class="btn" onclick="runTool('changelogInput','changelogOutput','changelogLabel','changelogLoader','Format these changes into a professional CHANGELOG.md entry using Keep a Changelog format (Added, Changed, Fixed, Removed sections):\n\n','Changelog Writer')">Format Changelog</button></div>
+      <div class="loader" id="changelogLoader"><div class="loader-dot"></div><div class="loader-dot"></div><div class="loader-dot"></div><span class="loader-txt">FORMATTING...</span></div>
+      <div class="output" id="changelogOutput"><span class="output-label" id="changelogLabel"></span><span id="changelogText"></span></div>
+      <div class="output-actions"><button class="copy-btn" onclick="copyOutput('changelogText',this)">Copy</button></div>
+    </div>
+  </div>
+
+  <!-- ══ PAGE: GIT COMMIT -->
+  <div class="page" id="page-commit">
+    <div class="page-header"><h1>Git Commit Writer</h1><p>Describe your changes — AI writes a clean commit message</p></div>
+    <div class="divider"></div>
+    <div class="card">
+      <div class="section-title">What Did You Change?</div>
+      <div class="input-wrap"><textarea class="ai-input" id="commitInput" rows="4" placeholder="Describe what you changed or added..."></textarea></div>
+      <div class="btn-row"><button class="btn" onclick="runTool('commitInput','commitOutput','commitLabel','commitLoader','Write a clean git commit message following Conventional Commits format (feat/fix/docs/refactor/chore etc). Include a short title and optional body:\n\n','Git Commit')">Write Commit</button></div>
+      <div class="loader" id="commitLoader"><div class="loader-dot"></div><div class="loader-dot"></div><div class="loader-dot"></div><span class="loader-txt">WRITING...</span></div>
+      <div class="output" id="commitOutput"><span class="output-label" id="commitLabel"></span><span id="commitText"></span></div>
+      <div class="output-actions"><button class="copy-btn" onclick="copyOutput('commitText',this)">Copy</button></div>
+    </div>
+  </div>
+
+  <!-- ══ PAGE: TERMINAL HELPER -->
+  <div class="page" id="page-terminal">
+    <div class="page-header"><h1>Terminal Command Helper</h1><p>Describe what you need — AI gives the exact command</p></div>
+    <div class="divider"></div>
+    <div class="card">
+      <div class="section-title">What Do You Want to Do?</div>
+      <div class="input-wrap"><textarea class="ai-input" id="termInput" rows="3" placeholder="e.g. List all files larger than 100MB in a folder, or set up a Docker container for Node.js..."></textarea></div>
+      <div class="btn-row"><button class="btn" onclick="runTool('termInput','termOutput','termLabel','termLoader','Give the exact terminal/shell/Docker command to accomplish this. Show the command, explain each part, and mention any flags or options:\n\n','Terminal Helper')">Get Command</button></div>
+      <div class="loader" id="termLoader"><div class="loader-dot"></div><div class="loader-dot"></div><div class="loader-dot"></div><span class="loader-txt">SEARCHING...</span></div>
+      <div class="output" id="termOutput"><span class="output-label" id="termLabel"></span><span id="termText"></span></div>
+      <div class="output-actions"><button class="copy-btn" onclick="copyOutput('termText',this)">Copy</button></div>
+    </div>
+  </div>
+
+  <!-- ══ PAGE: ERROR DECODER -->
+  <div class="page" id="page-error">
+    <div class="page-header"><h1>Error Decoder</h1><p>Paste a scary error — AI explains and fixes it</p></div>
+    <div class="divider"></div>
+    <div class="card">
+      <div class="section-title">Paste Your Error</div>
+      <div class="input-wrap"><textarea class="ai-input" id="errorInput" rows="6" placeholder="Paste the full error message or stack trace here..."></textarea></div>
+      <div class="btn-row"><button class="btn" onclick="runTool('errorInput','errorOutput','errorLabel','errorLoader','Explain this error message in simple English. Tell me what caused it and give me step-by-step instructions to fix it:\n\n','Error Decoder')">Decode Error</button></div>
+      <div class="loader" id="errorLoader"><div class="loader-dot"></div><div class="loader-dot"></div><div class="loader-dot"></div><span class="loader-txt">DECODING...</span></div>
+      <div class="output" id="errorOutput"><span class="output-label" id="errorLabel"></span><span id="errorText"></span></div>
+      <div class="output-actions"><button class="copy-btn" onclick="copyOutput('errorText',this)">Copy</button></div>
+    </div>
+  </div>
+
+  <!-- ══ PAGE: SQL BUILDER -->
+  <div class="page" id="page-sql">
+    <div class="page-header"><h1>SQL Query Builder</h1><p>Describe what data you want — AI writes the SQL</p></div>
+    <div class="divider"></div>
+    <div class="card">
+      <div class="section-title">What Data Do You Need?</div>
+      <div class="input-wrap"><textarea class="ai-input" id="sqlInput" rows="4" placeholder="e.g. Get all users who signed up in the last 30 days ordered by name, from a 'users' table with columns id, name, email, created_at..."></textarea></div>
+      <div class="btn-row"><button class="btn" onclick="runTool('sqlInput','sqlOutput','sqlLabel','sqlLoader','Write a clean SQL query for this request. Include comments explaining each part:\n\n','SQL Builder')">Build Query</button></div>
+      <div class="loader" id="sqlLoader"><div class="loader-dot"></div><div class="loader-dot"></div><div class="loader-dot"></div><span class="loader-txt">BUILDING...</span></div>
+      <div class="output" id="sqlOutput"><span class="output-label" id="sqlLabel"></span><span id="sqlText"></span></div>
+      <div class="output-actions"><button class="copy-btn" onclick="copyOutput('sqlText',this)">Copy</button></div>
+    </div>
+  </div>
+
+  <!-- ══ PAGE: JSON HELPER -->
+  <div class="page" id="page-json">
+    <div class="page-header"><h1>JSON Formatter & Explainer</h1><p>Paste messy JSON — AI cleans and explains it</p></div>
+    <div class="divider"></div>
+    <div class="card">
+      <div class="section-title">Paste JSON</div>
+      <div class="input-wrap"><textarea class="ai-input" id="jsonInput" rows="8" placeholder="Paste raw or messy JSON here..."></textarea></div>
+      <div class="btn-row">
+        <button class="btn" onclick="runTool('jsonInput','jsonOutput','jsonLabel','jsonLoader','Format this JSON properly and explain what each field means and what this data structure represents:\n\n','JSON Helper')">Format & Explain</button>
+        <button class="btn secondary" onclick="formatJsonOnly()">Just Format</button>
+      </div>
+      <div class="loader" id="jsonLoader"><div class="loader-dot"></div><div class="loader-dot"></div><div class="loader-dot"></div><span class="loader-txt">FORMATTING...</span></div>
+      <div class="output" id="jsonOutput"><span class="output-label" id="jsonLabel"></span><span id="jsonText"></span></div>
+      <div class="output-actions"><button class="copy-btn" onclick="copyOutput('jsonText',this)">Copy</button></div>
+    </div>
+  </div>
+
+  <!-- ══ PAGE: CSV ANALYZER -->
+  <div class="page" id="page-csv">
+    <div class="page-header"><h1>CSV Analyzer</h1><p>Paste data — AI finds patterns and insights</p></div>
+    <div class="divider"></div>
+    <div class="card">
+      <div class="section-title">Paste CSV Data</div>
+      <div class="input-wrap"><textarea class="ai-input" id="csvInput" rows="8" placeholder="Paste your CSV data here (include headers)..."></textarea></div>
+      <div class="btn-row"><button class="btn" onclick="runTool('csvInput','csvOutput','csvLabel','csvLoader','Analyze this CSV data. Identify key patterns, trends, anomalies, and insights. Summarize what the data shows:\n\n','CSV Analyzer')">Analyze</button></div>
+      <div class="loader" id="csvLoader"><div class="loader-dot"></div><div class="loader-dot"></div><div class="loader-dot"></div><span class="loader-txt">ANALYZING...</span></div>
+      <div class="output" id="csvOutput"><span class="output-label" id="csvLabel"></span><span id="csvText"></span></div>
+      <div class="output-actions"><button class="copy-btn" onclick="copyOutput('csvText',this)">Copy</button></div>
+    </div>
+  </div>
+
+  <!-- ══ PAGE: API EXPLAINER -->
+  <div class="page" id="page-apiexplain">
+    <div class="page-header"><h1>API Response Explainer</h1><p>Paste an API response — AI explains what it means</p></div>
+    <div class="divider"></div>
+    <div class="card">
+      <div class="section-title">Paste API Response</div>
+      <div class="input-wrap"><textarea class="ai-input" id="apiexplainInput" rows="8" placeholder="Paste your API response JSON or XML here..."></textarea></div>
+      <div class="btn-row"><button class="btn" onclick="runTool('apiexplainInput','apiexplainOutput','apiexplainLabel','apiexplainLoader','Explain this API response in plain English. What does it mean? What are the key fields? Are there any errors or warnings?\n\n','API Explainer')">Explain</button></div>
+      <div class="loader" id="apiexplainLoader"><div class="loader-dot"></div><div class="loader-dot"></div><div class="loader-dot"></div><span class="loader-txt">EXPLAINING...</span></div>
+      <div class="output" id="apiexplainOutput"><span class="output-label" id="apiexplainLabel"></span><span id="apiexplainText"></span></div>
+      <div class="output-actions"><button class="copy-btn" onclick="copyOutput('apiexplainText',this)">Copy</button></div>
+    </div>
+  </div>
+
+  <!-- ══ PAGE: CLOUD FILES -->
+  <div class="page" id="page-files">
+    <div class="page-header"><h1>Cloud Files</h1><p>Read and write files to Puter cloud storage</p></div>
+    <div class="divider"></div>
+    <div class="card">
+      <div class="section-title">File Operations</div>
+      <div class="kv-row">
+        <input class="kv-input" id="fileNameInput" placeholder="filename.txt" />
+        <input class="kv-input" id="fileContentInput" placeholder="File content..." />
+      </div>
+      <div class="btn-row">
+        <button class="btn" onclick="writeFile()">Write File</button>
+        <button class="btn secondary" onclick="readFile()">Read File</button>
+      </div>
+      <div class="output" id="fileOutput"><span class="output-label">FILESYSTEM</span><span id="fileText"></span></div>
+    </div>
+  </div>
+
+  <!-- ══ PAGE: KEY-VALUE -->
+  <div class="page" id="page-kv">
+    <div class="page-header"><h1>Key-Value Store</h1><p>Persistent key-value storage via Puter</p></div>
+    <div class="divider"></div>
+    <div class="card">
+      <div class="section-title">Store & Retrieve</div>
+      <div class="kv-row">
+        <input class="kv-input" id="kvKey" placeholder="Key" />
+        <input class="kv-input" id="kvValue" placeholder="Value" />
+      </div>
+      <div class="btn-row">
+        <button class="btn" onclick="setKV()">Set</button>
+        <button class="btn secondary" onclick="getKV()">Get</button>
+      </div>
+      <div class="output" id="kvOutput"><span class="output-label">KEY-VALUE STORE</span><span id="kvText"></span></div>
+    </div>
+  </div>
+
+</div><!-- /main -->
+</div><!-- /layout -->
 
 <script>
-  let selectedModel = 'gpt-4o-mini';
+// ═══════════════════════════════════════════ STATE
+let selectedModel = 'gpt-4o-mini';
+let selectedVoiceModel = 'gpt-4o-mini';
+let selectedPersonaPrompt = 'You are a helpful, concise assistant.';
+let selectedTone = '';
+let chatSessions = [[]]; // array of message arrays
+let activeTab = 0;
+let recognition = null;
+let isRecording = false;
 
-  // ── Puter detection ──────────────────────────────────────────────────────────
-  function puterReady() {
-    return typeof puter !== 'undefined' && puter?.ai;
+const PAGE_TITLES = {
+  chat:'AI Chat', image:'Image Generation', stream:'Streaming Essay', voice:'Voice Input',
+  summarizer:'Text Summarizer', email:'Email Writer', resume:'Resume Rewriter',
+  coverletter:'Cover Letter', essay:'Essay Grader', translator:'Translator', flashcards:'Flashcards',
+  explainer:'Code Explainer', bugfixer:'Bug Fixer', commenter:'Comment Writer',
+  readme:'README Generator', apidocs:'API Docs', changelog:'Changelog', commit:'Git Commit',
+  terminal:'Terminal Helper', error:'Error Decoder', sql:'SQL Builder', json:'JSON Helper',
+  csv:'CSV Analyzer', apiexplain:'API Explainer', files:'Cloud Files', kv:'Key-Value Store'
+};
+
+// ═══════════════════════════════════════════ INIT
+window.addEventListener('load', () => {
+  if (typeof puter === 'undefined' || !puter?.ai) {
+    document.getElementById('puterNotice').classList.add('visible');
   }
 
-  function requirePuter(outId, labelId, txtId) {
-    if (puterReady()) return true;
-    const out = document.getElementById(outId);
+  // char counter
+  document.getElementById('chatInput').addEventListener('input', function() {
+    const n = this.value.length;
+    const el = document.getElementById('charCounter');
+    el.textContent = n + ' / 4000';
+    el.className = 'char-counter' + (n > 3500 ? ' warn' : '');
+  });
+
+  // tone pills
+  document.querySelectorAll('.tone-pill').forEach(p => {
+    p.addEventListener('click', function() {
+      document.querySelectorAll('.tone-pill').forEach(x => x.classList.remove('active'));
+      this.classList.add('active');
+      selectedTone = this.dataset.tone;
+    });
+  });
+
+  renderChatHistory();
+});
+
+// ═══════════════════════════════════════════ NAV
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
+  document.querySelector(`.nav-item[data-page="${id}"]`).classList.add('active');
+  document.getElementById('topbar-title').textContent = PAGE_TITLES[id] || id.toUpperCase();
+  // close mobile sidebar
+  document.getElementById('sidebar').classList.remove('open');
+}
+
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('open');
+}
+
+// ═══════════════════════════════════════════ THEME
+function toggleTheme() {
+  const html = document.documentElement;
+  const isDark = html.dataset.theme === 'dark';
+  html.dataset.theme = isDark ? 'light' : 'dark';
+  document.getElementById('themeBtn').textContent = isDark ? '🌙' : '☀';
+}
+
+// ═══════════════════════════════════════════ PUTER CHECK
+function puterOk(outId, txtId) {
+  if (typeof puter !== 'undefined' && puter?.ai) return true;
+  const out = document.getElementById(outId);
+  out.classList.add('visible');
+  document.getElementById(txtId).textContent =
+    'PUTER NOT DETECTED\n\nUpload this file to puter.com to enable AI.\n\n' +
+    '1. Go to puter.com → sign in (free)\n2. Open Code Editor\n3. Paste this file → Run';
+  return false;
+}
+
+// ═══════════════════════════════════════════ PUTER CALL
+async function callAI(prompt, modelOverride) {
+  const model = modelOverride || selectedModel;
+  const fullPrompt = (selectedPersonaPrompt ? selectedPersonaPrompt + '\n\n' : '') +
+                     (selectedTone ? selectedTone + '\n\n' : '') + prompt;
+  const response = await puter.ai.chat(fullPrompt, { model });
+  let text = '';
+  if (typeof response === 'string') text = response;
+  else if (response?.message?.content) {
+    const c = response.message.content;
+    text = Array.isArray(c) ? c.map(b => b.text || '').join('') : String(c);
+  } else if (response?.text) text = response.text;
+  else text = JSON.stringify(response, null, 2);
+  return text;
+}
+
+// ═══════════════════════════════════════════ GENERIC TOOL RUNNER
+async function runTool(inputId, outputId, labelId, loaderId, systemPrompt, toolName) {
+  const input = document.getElementById(inputId).value.trim();
+  if (!input) { showToast('Please enter some text first'); return; }
+  const txtId = outputId.replace('Output','') + 'Text';
+  if (!puterOk(outputId, txtId)) return;
+
+  const loader = document.getElementById(loaderId);
+  const out = document.getElementById(outputId);
+  out.classList.remove('visible');
+  loader.classList.add('active');
+
+  try {
+    const result = await callAI(systemPrompt + input, 'gpt-4o-mini');
+    document.getElementById(labelId).textContent = toolName + ' — GPT-4o Mini';
+    document.getElementById(txtId).textContent = result;
     out.classList.add('visible');
-    if (labelId) document.getElementById(labelId).textContent = 'NOT ON PUTER';
-    document.getElementById(txtId).textContent =
-      'Puter.js is not available here.\n\n' +
-      'To use this app:\n' +
-      '1. Go to https://puter.com and sign in (free)\n' +
-      '2. Open the built-in Code Editor\n' +
-      '3. Paste this HTML file there and run it\n\n' +
-      'Puter only works when hosted inside puter.com — not as a local file.';
-    return false;
+  } catch(e) {
+    document.getElementById(labelId).textContent = 'ERROR';
+    document.getElementById(txtId).textContent = e.message || String(e);
+    out.classList.add('visible');
+  } finally { loader.classList.remove('active'); }
+}
+
+// ═══════════════════════════════════════════ AI CHAT
+function selectModel(el) {
+  el.closest('.card,div').querySelectorAll('.model-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  selectedModel = el.dataset.model;
+}
+function selectVoiceModel(el) {
+  el.closest('div').querySelectorAll('.model-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  selectedVoiceModel = el.dataset.model;
+}
+function selectPersona(el, name, prompt) {
+  document.querySelectorAll('.persona-card').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  selectedPersonaPrompt = prompt;
+  showToast('Persona set: ' + name);
+}
+
+// TABS
+function renderTabs() {
+  const bar = document.getElementById('tabBar');
+  bar.innerHTML = chatSessions.map((_, i) =>
+    `<div class="chat-tab ${i===activeTab?'active':''}" onclick="switchTab(${i})">
+       Session ${i+1}
+       ${chatSessions.length > 1 ? `<span class="close-tab" onclick="removeTab(event,${i})">✕</span>` : ''}
+     </div>`
+  ).join('') + '<button class="add-tab-btn" onclick="addTab()" title="New session">+</button>';
+}
+function switchTab(i) { activeTab = i; renderTabs(); renderChatHistory(); }
+function addTab() { chatSessions.push([]); activeTab = chatSessions.length-1; renderTabs(); renderChatHistory(); }
+function removeTab(e, i) {
+  e.stopPropagation();
+  chatSessions.splice(i,1);
+  if (activeTab >= chatSessions.length) activeTab = chatSessions.length-1;
+  renderTabs(); renderChatHistory();
+}
+
+function renderChatHistory() {
+  const hist = document.getElementById('chatHistory');
+  const msgs = chatSessions[activeTab] || [];
+  hist.innerHTML = msgs.map((m,i) => `
+    <div class="chat-bubble ${m.role}">
+      <span class="bubble-label">${m.role === 'user' ? 'YOU' : m.model || 'AI'}</span>
+      ${escHtml(m.content)}
+      <button class="bubble-copy" onclick="copyText(this,'${btoa(encodeURIComponent(m.content))}')">⎘</button>
+    </div>`).join('');
+  hist.scrollTop = hist.scrollHeight;
+}
+
+function escHtml(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+async function sendChat() {
+  const input = document.getElementById('chatInput').value.trim();
+  if (!input) return;
+  if (!puterOk('chatHistory','chatHistory')) {
+    // show notice in history area instead
+    const hist = document.getElementById('chatHistory');
+    hist.innerHTML = `<div class="chat-bubble ai"><span class="bubble-label">SYSTEM</span>PUTER NOT DETECTED — host this file on puter.com to use AI features.</div>`;
+    return;
   }
 
-  // ── Model selector ────────────────────────────────────────────────────────────
-  function selectModel(el) {
-    document.querySelectorAll('.model-tab').forEach(t => t.classList.remove('active'));
-    el.classList.add('active');
-    selectedModel = el.dataset.model;
-  }
+  chatSessions[activeTab].push({ role:'user', content:input });
+  renderChatHistory();
+  document.getElementById('chatInput').value = '';
+  document.getElementById('charCounter').textContent = '0 / 4000';
 
-  // ── Chat ──────────────────────────────────────────────────────────────────────
-  async function sendChat() {
-    const input = document.getElementById('chatInput').value.trim();
-    if (!input) return;
-    if (!requirePuter('chatOutput', 'outputLabel', 'outputText')) return;
+  const loader = document.getElementById('chatLoader');
+  const loaderTxt = document.getElementById('loaderTxt');
+  loader.classList.add('active');
+  loaderTxt.textContent = selectedModel.toUpperCase() + ' THINKING...';
 
-    const loader    = document.getElementById('chatLoader');
-    const loaderTxt = document.getElementById('loaderText');
-    const out       = document.getElementById('chatOutput');
-    const outText   = document.getElementById('outputText');
-    const outLabel  = document.getElementById('outputLabel');
+  try {
+    const result = await callAI(input);
+    const modelLabel = selectedModel === 'claude-sonnet-4-5' ? 'Claude Sonnet 4' : 'GPT-4o Mini';
+    chatSessions[activeTab].push({ role:'ai', content:result, model:modelLabel });
+    renderChatHistory();
+  } catch(e) {
+    chatSessions[activeTab].push({ role:'ai', content:'Error: ' + (e.message||String(e)), model:'ERROR' });
+    renderChatHistory();
+  } finally { loader.classList.remove('active'); }
+}
 
-    loader.classList.add('active');
-    loaderTxt.textContent = selectedModel.toUpperCase() + ' PROCESSING...';
-    out.classList.remove('visible');
-    outText.textContent = '';
+function clearChat() {
+  chatSessions[activeTab] = [];
+  renderChatHistory();
+}
 
-    try {
-      const modelId = selectedModel === 'claude-sonnet-4' ? 'claude-sonnet-4-5' : 'gpt-4o-mini';
-      const labelName = selectedModel === 'claude-sonnet-4' ? 'Claude Sonnet 4' : 'GPT-4o Mini';
+function exportChat() {
+  const msgs = chatSessions[activeTab];
+  if (!msgs.length) { showToast('No messages to export'); return; }
+  const txt = msgs.map(m => `[${m.role.toUpperCase()}] ${m.content}`).join('\n\n---\n\n');
+  const blob = new Blob([txt], {type:'text/plain'});
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+  a.download = 'chica-chat-' + Date.now() + '.txt'; a.click();
+  showToast('Chat exported!');
+}
 
-      const response = await puter.ai.chat(input, { model: modelId });
-
-      // Puter returns different shapes — handle all of them
-      let text = '';
-      if (typeof response === 'string') {
-        text = response;
-      } else if (response?.message?.content) {
-        const c = response.message.content;
-        text = Array.isArray(c) ? c.map(b => b.text || '').join('') : String(c);
-      } else if (response?.text) {
-        text = response.text;
-      } else {
-        text = JSON.stringify(response, null, 2);
-      }
-
-      outLabel.textContent = labelName + ' — Response';
-      outText.textContent  = text;
-      out.classList.add('visible');
-    } catch (e) {
-      outLabel.textContent = 'ERROR';
-      outText.textContent  = e.message || String(e);
-      out.classList.add('visible');
-    } finally {
-      loader.classList.remove('active');
-    }
-  }
-
-  // ── Streaming essay ───────────────────────────────────────────────────────────
-  async function streamEssay() {
-    const topic = document.getElementById('streamInput').value.trim() || 'artificial intelligence';
-    if (!requirePuter('streamOutput', null, 'streamText')) return;
-
-    const loader     = document.getElementById('streamLoader');
-    const out        = document.getElementById('streamOutput');
-    const streamText = document.getElementById('streamText');
-
-    loader.classList.add('active');
-    out.classList.remove('visible');
-    streamText.textContent = '';
-
-    try {
-      const response = await puter.ai.chat(
-        `Write a brief, engaging essay about: ${topic}`,
-        { model: 'gpt-4o-mini', stream: true }
-      );
-      out.classList.add('visible');
-      for await (const part of response) {
-        // Puter streaming chunks may be strings or objects
-        if (typeof part === 'string') streamText.textContent += part;
-        else streamText.textContent += part?.text ?? part?.delta?.text ?? '';
-      }
-    } catch (e) {
-      streamText.textContent = 'Stream failed: ' + (e.message || String(e));
-      out.classList.add('visible');
-    } finally {
-      loader.classList.remove('active');
-    }
-  }
-
-  // ── Cloud Files ───────────────────────────────────────────────────────────────
-  async function writeFile() {
-    if (!requirePuter('fileOutput', null, 'fileText')) return;
-    const name    = document.getElementById('fileNameInput').value.trim()    || 'chica-file.txt';
-    const content = document.getElementById('fileContentInput').value.trim() || 'Hello from Chica!';
-    const out = document.getElementById('fileOutput');
-    const txt = document.getElementById('fileText');
-    txt.textContent = 'Writing...'; out.classList.add('visible');
-    try {
-      await puter.fs.write(name, content);
-      txt.textContent = 'File written successfully: ' + name;
-    } catch (e) { txt.textContent = 'Error: ' + (e.message || String(e)); }
-  }
-
-  async function readFile() {
-    if (!requirePuter('fileOutput', null, 'fileText')) return;
-    const name = document.getElementById('fileNameInput').value.trim() || 'chica-file.txt';
-    const out  = document.getElementById('fileOutput');
-    const txt  = document.getElementById('fileText');
-    txt.textContent = 'Reading...'; out.classList.add('visible');
-    try {
-      const blob = await puter.fs.read(name);
-      txt.textContent = 'Content of ' + name + ':\n\n' + await blob.text();
-    } catch (e) { txt.textContent = 'Error: ' + (e.message || String(e)); }
-  }
-
-  // ── Key-Value ─────────────────────────────────────────────────────────────────
-  async function setKV() {
-    if (!requirePuter('kvOutput', null, 'kvText')) return;
-    const k = document.getElementById('kvKey').value.trim();
-    const v = document.getElementById('kvValue').value.trim();
-    const out = document.getElementById('kvOutput');
-    const txt = document.getElementById('kvText');
-    if (!k) { txt.textContent = 'Key is required.'; out.classList.add('visible'); return; }
-    txt.textContent = 'Setting...'; out.classList.add('visible');
-    try {
-      await puter.kv.set(k, v);
-      txt.textContent = 'Set: ' + k + ' = ' + v;
-    } catch (e) { txt.textContent = 'Error: ' + (e.message || String(e)); }
-  }
-
-  async function getKV() {
-    if (!requirePuter('kvOutput', null, 'kvText')) return;
-    const k = document.getElementById('kvKey').value.trim();
-    const out = document.getElementById('kvOutput');
-    const txt = document.getElementById('kvText');
-    if (!k) { txt.textContent = 'Key is required.'; out.classList.add('visible'); return; }
-    txt.textContent = 'Fetching...'; out.classList.add('visible');
-    try {
-      const val = await puter.kv.get(k);
-      txt.textContent = 'Value: ' + (val ?? '(not found)');
-    } catch (e) { txt.textContent = 'Error: ' + (e.message || String(e)); }
-  }
-
-  // ── Helpers ───────────────────────────────────────────────────────────────────
-  function clearChat() {
-    document.getElementById('chatInput').value = '';
-    document.getElementById('chatOutput').classList.remove('visible');
-  }
-
-  document.getElementById('chatInput').addEventListener('keydown', e => {
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('chatInput')?.addEventListener('keydown', e => {
     if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendChat(); }
   });
+});
 
-  // Show a one-time banner if puter isn't loaded yet
-  window.addEventListener('load', () => {
-    if (!puterReady()) {
-      const banner = document.createElement('div');
-      banner.style.cssText = `
-        position:fixed; bottom:20px; left:50%; transform:translateX(-50%);
-        background:#0a0a0a; border:1px solid #ff1a1a;
-        color:#ff1a1a; font-family:'Share Tech Mono',monospace;
-        font-size:11px; letter-spacing:2px; padding:12px 24px;
-        z-index:9999; text-align:center; max-width:90vw;
-        box-shadow:0 0 20px rgba(255,26,26,0.3);
-        animation: fadeIn 0.5s ease;
-      `;
-      banner.textContent = 'PUTER NOT DETECTED — Upload this file to puter.com to enable AI features';
-      document.body.appendChild(banner);
-      setTimeout(() => banner.remove(), 8000);
+// ═══════════════════════════════════════════ IMAGE GEN
+async function generateImage() {
+  const prompt = document.getElementById('imgPrompt').value.trim();
+  if (!prompt) { showToast('Enter a prompt first'); return; }
+  if (typeof puter === 'undefined') {
+    document.getElementById('imgGrid').innerHTML = '<p style="color:var(--text-dim);font-size:11px;padding:20px;">Puter not detected. Host on puter.com first.</p>';
+    return;
+  }
+  const loader = document.getElementById('imgLoader');
+  loader.classList.add('active');
+  try {
+    const img = await puter.ai.txt2img(prompt);
+    const grid = document.getElementById('imgGrid');
+    const card = document.createElement('div'); card.className = 'img-card';
+    const src = img.src || img;
+    card.innerHTML = `<img src="${src}" alt="Generated"><div class="img-dl" onclick="downloadImg('${src}')">Save</div>`;
+    grid.prepend(card);
+  } catch(e) {
+    document.getElementById('imgGrid').innerHTML = `<p style="color:var(--red);font-size:11px;padding:20px;">Error: ${e.message}</p>`;
+  } finally { loader.classList.remove('active'); }
+}
+
+function downloadImg(src) {
+  const a = document.createElement('a'); a.href = src; a.download = 'chica-img-'+Date.now()+'.png'; a.click();
+}
+
+// ═══════════════════════════════════════════ STREAMING
+async function streamEssay() {
+  const topic = document.getElementById('streamInput').value.trim() || 'artificial intelligence';
+  if (typeof puter === 'undefined') { showToast('Puter not detected'); return; }
+  const loader = document.getElementById('streamLoader');
+  const out = document.getElementById('streamOutput');
+  const txt = document.getElementById('streamText');
+  loader.classList.add('active'); out.classList.remove('visible'); txt.textContent = '';
+  try {
+    const response = await puter.ai.chat(`Write a brief, engaging essay about: ${topic}`, { model:'gpt-4o-mini', stream:true });
+    out.classList.add('visible');
+    for await (const part of response) {
+      txt.textContent += typeof part === 'string' ? part : (part?.text ?? part?.delta?.text ?? '');
     }
+    document.getElementById('streamActions').style.display = 'flex';
+  } catch(e) { txt.textContent = 'Error: '+(e.message||String(e)); out.classList.add('visible'); }
+  finally { loader.classList.remove('active'); }
+}
+
+// ═══════════════════════════════════════════ VOICE
+function toggleVoice() {
+  if (!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
+    showToast('Speech recognition not supported in this browser'); return;
+  }
+  if (isRecording) { stopVoice(); return; }
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  recognition = new SR();
+  recognition.continuous = true; recognition.interimResults = true; recognition.lang = 'en-US';
+  recognition.onresult = (e) => {
+    let transcript = '';
+    for (let i = e.resultIndex; i < e.results.length; i++) transcript += e.results[i][0].transcript;
+    document.getElementById('voiceTranscript').value = transcript;
+  };
+  recognition.onerror = () => stopVoice();
+  recognition.onend = () => stopVoice();
+  recognition.start();
+  isRecording = true;
+  document.getElementById('voiceBtn').classList.add('recording');
+  document.getElementById('voiceStatus').textContent = 'Recording... click to stop';
+}
+
+function stopVoice() {
+  if (recognition) { try { recognition.stop(); } catch(e){} }
+  isRecording = false;
+  document.getElementById('voiceBtn').classList.remove('recording');
+  document.getElementById('voiceStatus').textContent = 'Recording stopped. Edit or send below.';
+}
+
+async function sendVoiceChat() {
+  const text = document.getElementById('voiceTranscript').value.trim();
+  if (!text) { showToast('No transcript yet'); return; }
+  if (!puterOk('voiceOutput','voiceText')) return;
+  const loader = document.getElementById('voiceLoader');
+  const out = document.getElementById('voiceOutput');
+  loader.classList.add('active'); out.classList.remove('visible');
+  try {
+    const result = await callAI(text, selectedVoiceModel);
+    const label = selectedVoiceModel === 'claude-sonnet-4-5' ? 'Claude Sonnet 4' : 'GPT-4o Mini';
+    document.getElementById('voiceLabel').textContent = label + ' — Response';
+    document.getElementById('voiceText').textContent = result;
+    out.classList.add('visible');
+  } catch(e) {
+    document.getElementById('voiceLabel').textContent = 'ERROR';
+    document.getElementById('voiceText').textContent = e.message || String(e);
+    out.classList.add('visible');
+  } finally { loader.classList.remove('active'); }
+}
+
+// ═══════════════════════════════════════════ TRANSLATOR
+async function translateText() {
+  const text = document.getElementById('transInput').value.trim();
+  const lang = document.getElementById('transLang').value;
+  if (!text) { showToast('Enter text to translate'); return; }
+  if (!puterOk('transOutput','transText')) return;
+  const loader = document.getElementById('transLoader');
+  const out = document.getElementById('transOutput');
+  loader.classList.add('active'); out.classList.remove('visible');
+  try {
+    const result = await callAI(`Translate the following text to ${lang}. Only output the translation, nothing else:\n\n${text}`, 'gpt-4o-mini');
+    document.getElementById('transLabel').textContent = `Translated to ${lang}`;
+    document.getElementById('transText').textContent = result;
+    out.classList.add('visible');
+  } catch(e) {
+    document.getElementById('transLabel').textContent = 'ERROR';
+    document.getElementById('transText').textContent = e.message || String(e);
+    out.classList.add('visible');
+  } finally { loader.classList.remove('active'); }
+}
+
+// ═══════════════════════════════════════════ FLASHCARDS
+async function generateFlashcards() {
+  const notes = document.getElementById('flashInput').value.trim();
+  if (!notes) { showToast('Paste your notes first'); return; }
+  if (!puterOk('flashGrid','flashGrid')) return;
+  const loader = document.getElementById('flashLoader');
+  loader.classList.add('active');
+  document.getElementById('flashGrid').innerHTML = '';
+  try {
+    const result = await callAI(
+      'Create 8-12 study flashcards from these notes. Return ONLY a JSON array like: [{"q":"question","a":"answer"},...]\n\n' + notes,
+      'gpt-4o-mini'
+    );
+    const clean = result.replace(/```json|```/g,'').trim();
+    const cards = JSON.parse(clean);
+    const grid = document.getElementById('flashGrid');
+    grid.innerHTML = cards.map((c,i) => `
+      <div class="flashcard" onclick="this.classList.toggle('flipped')">
+        <div class="fc-q">${escHtml(c.q)}</div>
+        <div class="fc-a">${escHtml(c.a)}</div>
+        <span class="fc-hint">tap to flip</span>
+      </div>`).join('');
+  } catch(e) {
+    document.getElementById('flashGrid').innerHTML = `<p style="color:var(--red);font-size:11px;padding:12px;">Error: ${e.message}</p>`;
+  } finally { loader.classList.remove('active'); }
+}
+
+// ═══════════════════════════════════════════ JSON FORMAT ONLY
+function formatJsonOnly() {
+  const raw = document.getElementById('jsonInput').value.trim();
+  const out = document.getElementById('jsonOutput');
+  const txt = document.getElementById('jsonText');
+  try {
+    const parsed = JSON.parse(raw);
+    document.getElementById('jsonLabel').textContent = 'Formatted JSON';
+    txt.textContent = JSON.stringify(parsed, null, 2);
+    out.classList.add('visible');
+  } catch(e) {
+    document.getElementById('jsonLabel').textContent = 'PARSE ERROR';
+    txt.textContent = 'Invalid JSON: ' + e.message;
+    out.classList.add('visible');
+  }
+}
+
+// ═══════════════════════════════════════════ CLOUD FILES
+async function writeFile() {
+  if (typeof puter==='undefined') { showToast('Puter not detected'); return; }
+  const name = document.getElementById('fileNameInput').value.trim()||'chica-file.txt';
+  const content = document.getElementById('fileContentInput').value.trim()||'Hello from Chica!';
+  const out = document.getElementById('fileOutput'); const txt = document.getElementById('fileText');
+  txt.textContent = 'Writing...'; out.classList.add('visible');
+  try { await puter.fs.write(name,content); txt.textContent = 'Written: '+name; }
+  catch(e) { txt.textContent = 'Error: '+e.message; }
+}
+async function readFile() {
+  if (typeof puter==='undefined') { showToast('Puter not detected'); return; }
+  const name = document.getElementById('fileNameInput').value.trim()||'chica-file.txt';
+  const out = document.getElementById('fileOutput'); const txt = document.getElementById('fileText');
+  txt.textContent = 'Reading...'; out.classList.add('visible');
+  try { const blob = await puter.fs.read(name); txt.textContent = 'Content:\n\n'+await blob.text(); }
+  catch(e) { txt.textContent = 'Error: '+e.message; }
+}
+
+// ═══════════════════════════════════════════ KEY-VALUE
+async function setKV() {
+  if (typeof puter==='undefined') { showToast('Puter not detected'); return; }
+  const k = document.getElementById('kvKey').value.trim();
+  const v = document.getElementById('kvValue').value.trim();
+  const out = document.getElementById('kvOutput'); const txt = document.getElementById('kvText');
+  if (!k) { txt.textContent='Key required'; out.classList.add('visible'); return; }
+  txt.textContent='Setting...'; out.classList.add('visible');
+  try { await puter.kv.set(k,v); txt.textContent='Set: '+k+' = '+v; }
+  catch(e) { txt.textContent='Error: '+e.message; }
+}
+async function getKV() {
+  if (typeof puter==='undefined') { showToast('Puter not detected'); return; }
+  const k = document.getElementById('kvKey').value.trim();
+  const out = document.getElementById('kvOutput'); const txt = document.getElementById('kvText');
+  if (!k) { txt.textContent='Key required'; out.classList.add('visible'); return; }
+  txt.textContent='Fetching...'; out.classList.add('visible');
+  try { const val = await puter.kv.get(k); txt.textContent='Value: '+(val??'(not found)'); }
+  catch(e) { txt.textContent='Error: '+e.message; }
+}
+
+// ═══════════════════════════════════════════ COPY UTILS
+function copyOutput(txtId, btn) {
+  const text = document.getElementById(txtId)?.textContent || '';
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = 'Copied!'; btn.classList.add('copied');
+    setTimeout(() => { btn.textContent='Copy'; btn.classList.remove('copied'); }, 2000);
   });
+}
+function copyText(btn, encoded) {
+  const text = decodeURIComponent(atob(encoded));
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = '✓';
+    setTimeout(() => btn.textContent='⎘', 2000);
+  });
+}
+
+// ═══════════════════════════════════════════ TOAST
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+// ═══════════════════════════════════════════ ENTER KEY
+window.addEventListener('keydown', e => {
+  if (e.key==='Enter' && !e.shiftKey && document.activeElement?.id==='chatInput') {
+    e.preventDefault(); sendChat();
+  }
+});
 </script>
+</body>
+</html>
 </body>
 </html>
