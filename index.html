@@ -200,6 +200,14 @@ select.ai-select:focus{border-color:rgba(232,37,26,.5);}
 .puter-notice.visible{display:block;}
 .puter-notice strong{color:var(--red);font-weight:600;}
 
+/* ═══════════════════════════════════════════ COLLAPSIBLE SIDEBAR */
+.sidebar-label.collapsible{cursor:pointer;display:flex;justify-content:space-between;align-items:center;user-select:none;transition:color var(--transition);}
+.sidebar-label.collapsible:hover{color:var(--text-mid);}
+.sidebar-label .caret{font-size:9px;transition:transform .2s ease;opacity:.5;}
+.sidebar-label.collapsed .caret{transform:rotate(-90deg);}
+.section-items{overflow:hidden;transition:max-height .25s ease,opacity .2s ease;max-height:800px;opacity:1;}
+.section-items.collapsed{max-height:0 !important;opacity:0;pointer-events:none;}
+
 /* ═══════════════════════════════════════════ SCROLLBAR */
 ::-webkit-scrollbar{width:4px;height:4px;}
 ::-webkit-scrollbar-track{background:transparent;}
@@ -235,45 +243,98 @@ select.ai-select:focus{border-color:rgba(232,37,26,.5);}
     <div class="nav-item active" onclick="showPage('chat')" data-page="chat"><span class="icon">💬</span>AI Chat</div>
     <div class="nav-item" onclick="showPage('image')" data-page="image"><span class="icon">🖼</span>Image Gen</div>
     <div class="nav-item" onclick="showPage('stream')" data-page="stream"><span class="icon">⚡</span>Streaming</div>
-    <div class="nav-item" onclick="showPage('voice')" data-page="voice"><span class="icon">🎙</span>Voice Input</div>
+    <div class="nav-item" onclick="showPage('voice')" data-page="voice"><span class="icon">🎙</span>Voice</div>
   </div>
 
   <div class="sidebar-section">
-    <div class="sidebar-label">Writing</div>
-    <div class="nav-item" onclick="showPage('summarizer')" data-page="summarizer"><span class="icon">📄</span>Summarizer</div>
-    <div class="nav-item" onclick="showPage('email')" data-page="email"><span class="icon">📧</span>Email Writer</div>
-    <div class="nav-item" onclick="showPage('resume')" data-page="resume"><span class="icon">📋</span>Resume Rewriter</div>
-    <div class="nav-item" onclick="showPage('coverletter')" data-page="coverletter"><span class="icon">✉</span>Cover Letter</div>
-    <div class="nav-item" onclick="showPage('essay')" data-page="essay"><span class="icon">📝</span>Essay Grader</div>
-    <div class="nav-item" onclick="showPage('translator')" data-page="translator"><span class="icon">🌐</span>Translator</div>
-    <div class="nav-item" onclick="showPage('flashcards')" data-page="flashcards"><span class="icon">🃏</span>Flashcards</div>
+    <div class="sidebar-label collapsible" onclick="toggleSection(this)">Writing <span class="caret">▾</span></div>
+    <div class="section-items">
+      <div class="nav-item" onclick="showPage('summarizer')" data-page="summarizer"><span class="icon">📄</span>Summarizer</div>
+      <div class="nav-item" onclick="showPage('email')" data-page="email"><span class="icon">📧</span>Email Writer</div>
+      <div class="nav-item" onclick="showPage('resume')" data-page="resume"><span class="icon">📋</span>Resume Rewriter</div>
+      <div class="nav-item" onclick="showPage('coverletter')" data-page="coverletter"><span class="icon">✉</span>Cover Letter</div>
+      <div class="nav-item" onclick="showPage('essay')" data-page="essay"><span class="icon">📝</span>Essay Grader</div>
+      <div class="nav-item" onclick="showPage('translator')" data-page="translator"><span class="icon">🌐</span>Translator</div>
+      <div class="nav-item" onclick="showPage('flashcards')" data-page="flashcards"><span class="icon">🃏</span>Flashcards</div>
+      <div class="nav-item" onclick="showPage('blogpost')" data-page="blogpost"><span class="icon">✍</span>Blog Post</div>
+      <div class="nav-item" onclick="showPage('linkedin')" data-page="linkedin"><span class="icon">💼</span>LinkedIn Bio</div>
+      <div class="nav-item" onclick="showPage('listicle')" data-page="listicle"><span class="icon">📑</span>Listicle</div>
+    </div>
   </div>
 
   <div class="sidebar-section">
-    <div class="sidebar-label">Code</div>
-    <div class="nav-item" onclick="showPage('explainer')" data-page="explainer"><span class="icon">🔍</span>Code Explainer</div>
-    <div class="nav-item" onclick="showPage('bugfixer')" data-page="bugfixer"><span class="icon">🐛</span>Bug Fixer</div>
-    <div class="nav-item" onclick="showPage('commenter')" data-page="commenter"><span class="icon">💬</span>Comment Writer</div>
-    <div class="nav-item" onclick="showPage('readme')" data-page="readme"><span class="icon">📚</span>README Gen</div>
-    <div class="nav-item" onclick="showPage('apidocs')" data-page="apidocs"><span class="icon">📖</span>API Docs</div>
-    <div class="nav-item" onclick="showPage('changelog')" data-page="changelog"><span class="icon">📋</span>Changelog</div>
-    <div class="nav-item" onclick="showPage('commit')" data-page="commit"><span class="icon">🔀</span>Git Commit</div>
-    <div class="nav-item" onclick="showPage('terminal')" data-page="terminal"><span class="icon">⌨</span>Terminal Help</div>
-    <div class="nav-item" onclick="showPage('error')" data-page="error"><span class="icon">🚨</span>Error Decoder</div>
+    <div class="sidebar-label collapsible" onclick="toggleSection(this)">Code <span class="caret">▾</span></div>
+    <div class="section-items">
+      <div class="nav-item" onclick="showPage('explainer')" data-page="explainer"><span class="icon">🔍</span>Code Explainer</div>
+      <div class="nav-item" onclick="showPage('bugfixer')" data-page="bugfixer"><span class="icon">🐛</span>Bug Fixer</div>
+      <div class="nav-item" onclick="showPage('commenter')" data-page="commenter"><span class="icon">💬</span>Comments</div>
+      <div class="nav-item" onclick="showPage('readme')" data-page="readme"><span class="icon">📚</span>README Gen</div>
+      <div class="nav-item" onclick="showPage('apidocs')" data-page="apidocs"><span class="icon">📖</span>API Docs</div>
+      <div class="nav-item" onclick="showPage('changelog')" data-page="changelog"><span class="icon">📋</span>Changelog</div>
+      <div class="nav-item" onclick="showPage('commit')" data-page="commit"><span class="icon">🔀</span>Git Commit</div>
+      <div class="nav-item" onclick="showPage('terminal')" data-page="terminal"><span class="icon">⌨</span>Terminal</div>
+      <div class="nav-item" onclick="showPage('error')" data-page="error"><span class="icon">🚨</span>Error Decoder</div>
+      <div class="nav-item" onclick="showPage('unittest')" data-page="unittest"><span class="icon">🧪</span>Unit Tests</div>
+      <div class="nav-item" onclick="showPage('converter')" data-page="converter"><span class="icon">🔄</span>Converter</div>
+      <div class="nav-item" onclick="showPage('regex')" data-page="regex"><span class="icon">🔎</span>Regex Builder</div>
+      <div class="nav-item" onclick="showPage('depexplain')" data-page="depexplain"><span class="icon">📦</span>Dependencies</div>
+      <div class="nav-item" onclick="showPage('codereview')" data-page="codereview"><span class="icon">👁</span>Code Review</div>
+    </div>
   </div>
 
   <div class="sidebar-section">
-    <div class="sidebar-label">Data</div>
-    <div class="nav-item" onclick="showPage('sql')" data-page="sql"><span class="icon">🗄</span>SQL Builder</div>
-    <div class="nav-item" onclick="showPage('json')" data-page="json"><span class="icon">{ }</span>JSON Helper</div>
-    <div class="nav-item" onclick="showPage('csv')" data-page="csv"><span class="icon">📊</span>CSV Analyzer</div>
-    <div class="nav-item" onclick="showPage('apiexplain')" data-page="apiexplain"><span class="icon">🔌</span>API Explainer</div>
+    <div class="sidebar-label collapsible" onclick="toggleSection(this)">Data <span class="caret">▾</span></div>
+    <div class="section-items">
+      <div class="nav-item" onclick="showPage('sql')" data-page="sql"><span class="icon">🗄</span>SQL Builder</div>
+      <div class="nav-item" onclick="showPage('json')" data-page="json"><span class="icon">{ }</span>JSON Helper</div>
+      <div class="nav-item" onclick="showPage('csv')" data-page="csv"><span class="icon">📊</span>CSV Analyzer</div>
+      <div class="nav-item" onclick="showPage('apiexplain')" data-page="apiexplain"><span class="icon">🔌</span>API Explainer</div>
+    </div>
   </div>
 
   <div class="sidebar-section">
-    <div class="sidebar-label">Storage</div>
-    <div class="nav-item" onclick="showPage('files')" data-page="files"><span class="icon">☁</span>Cloud Files</div>
-    <div class="nav-item" onclick="showPage('kv')" data-page="kv"><span class="icon">🔑</span>Key-Value</div>
+    <div class="sidebar-label collapsible" onclick="toggleSection(this)">AI / Productivity <span class="caret">▾</span></div>
+    <div class="section-items">
+      <div class="nav-item" onclick="showPage('promptopt')" data-page="promptopt"><span class="icon">⚡</span>Prompt Optimizer</div>
+      <div class="nav-item" onclick="showPage('imgdesc')" data-page="imgdesc"><span class="icon">🖼</span>Image Describer</div>
+      <div class="nav-item" onclick="showPage('chatbotscript')" data-page="chatbotscript"><span class="icon">🤖</span>Chatbot Script</div>
+    </div>
+  </div>
+
+  <div class="sidebar-section">
+    <div class="sidebar-label collapsible" onclick="toggleSection(this)">Design <span class="caret">▾</span></div>
+    <div class="section-items">
+      <div class="nav-item" onclick="showPage('colorpalette')" data-page="colorpalette"><span class="icon">🎨</span>Color Palette</div>
+      <div class="nav-item" onclick="showPage('uicopy')" data-page="uicopy"><span class="icon">✏</span>UI Copy</div>
+      <div class="nav-item" onclick="showPage('icondesc')" data-page="icondesc"><span class="icon">🔷</span>Icon Description</div>
+    </div>
+  </div>
+
+  <div class="sidebar-section">
+    <div class="sidebar-label collapsible" onclick="toggleSection(this)">Career <span class="caret">▾</span></div>
+    <div class="section-items">
+      <div class="nav-item" onclick="showPage('interview')" data-page="interview"><span class="icon">🎤</span>Interview Prep</div>
+      <div class="nav-item" onclick="showPage('jobdesc')" data-page="jobdesc"><span class="icon">📄</span>Job Description</div>
+      <div class="nav-item" onclick="showPage('salary')" data-page="salary"><span class="icon">💰</span>Salary Script</div>
+    </div>
+  </div>
+
+  <div class="sidebar-section">
+    <div class="sidebar-label collapsible" onclick="toggleSection(this)">Quick Tools <span class="caret">▾</span></div>
+    <div class="section-items">
+      <div class="nav-item" onclick="showPage('sluggen')" data-page="sluggen"><span class="icon">🔗</span>Slug Generator</div>
+      <div class="nav-item" onclick="showPage('cronexplain')" data-page="cronexplain"><span class="icon">⏰</span>Cron Explainer</div>
+      <div class="nav-item" onclick="showPage('httpstatus')" data-page="httpstatus"><span class="icon">🌐</span>HTTP Status</div>
+      <div class="nav-item" onclick="showPage('mdpreview')" data-page="mdpreview"><span class="icon">👁</span>MD Previewer</div>
+    </div>
+  </div>
+
+  <div class="sidebar-section">
+    <div class="sidebar-label collapsible" onclick="toggleSection(this)">Storage <span class="caret">▾</span></div>
+    <div class="section-items">
+      <div class="nav-item" onclick="showPage('files')" data-page="files"><span class="icon">☁</span>Cloud Files</div>
+      <div class="nav-item" onclick="showPage('kv')" data-page="kv"><span class="icon">🔑</span>Key-Value</div>
+    </div>
   </div>
 </nav>
 
@@ -766,6 +827,325 @@ select.ai-select:focus{border-color:rgba(232,37,26,.5);}
     </div>
   </div>
 
+  <!-- ══ PAGE: BLOG POST -->
+  <div class="page" id="page-blogpost">
+    <div class="page-header"><h1>Blog Post <span>Writer</span></h1><p>Generate dev blog posts or tutorials from a topic</p></div>
+    <div class="divider"></div>
+    <div class="card">
+      <div class="section-title">Topic & Details</div>
+      <div class="input-wrap"><textarea class="ai-input" id="blogpostInput" rows="4" placeholder="e.g. How to build a REST API with Node.js and Express for beginners..."></textarea></div>
+      <div class="btn-row"><button class="btn" onclick="runTool('blogpostInput','blogpostOutput','blogpostLabel','blogpostLoader','Write a complete, engaging dev blog post or tutorial based on this topic. Include an intro, sections with headings, code examples where relevant, and a conclusion:\n\n','Blog Post Writer')">Write Post</button></div>
+      <div class="loader" id="blogpostLoader"><div class="loader-dot"></div><div class="loader-dot"></div><div class="loader-dot"></div><span class="loader-txt">Writing...</span></div>
+      <div class="output" id="blogpostOutput"><span class="output-label" id="blogpostLabel"></span><span id="blogpostText"></span></div>
+      <div class="output-actions"><button class="copy-btn" onclick="copyOutput('blogpostText',this)">Copy</button></div>
+    </div>
+  </div>
+
+  <!-- ══ PAGE: LINKEDIN BIO -->
+  <div class="page" id="page-linkedin">
+    <div class="page-header"><h1>LinkedIn <span>Bio Writer</span></h1><p>Craft a standout LinkedIn About section</p></div>
+    <div class="divider"></div>
+    <div class="card">
+      <div class="section-title">Your Background</div>
+      <div class="input-wrap"><textarea class="ai-input" id="linkedinInput" rows="4" placeholder="Describe your role, experience, skills, and what you're looking for..."></textarea></div>
+      <div class="btn-row"><button class="btn" onclick="runTool('linkedinInput','linkedinOutput','linkedinLabel','linkedinLoader','Write a compelling, professional LinkedIn About section. Make it personal, keyword-rich, and engaging. First person, 3–5 paragraphs:\n\n','LinkedIn Bio')">Write Bio</button></div>
+      <div class="loader" id="linkedinLoader"><div class="loader-dot"></div><div class="loader-dot"></div><div class="loader-dot"></div><span class="loader-txt">Writing...</span></div>
+      <div class="output" id="linkedinOutput"><span class="output-label" id="linkedinLabel"></span><span id="linkedinText"></span></div>
+      <div class="output-actions"><button class="copy-btn" onclick="copyOutput('linkedinText',this)">Copy</button></div>
+    </div>
+  </div>
+
+  <!-- ══ PAGE: LISTICLE -->
+  <div class="page" id="page-listicle">
+    <div class="page-header"><h1>Listicle <span>Generator</span></h1><p>Turn any topic into a structured list article</p></div>
+    <div class="divider"></div>
+    <div class="card">
+      <div class="section-title">Topic</div>
+      <div class="input-wrap"><textarea class="ai-input" id="listicleInput" rows="3" placeholder="e.g. 10 VS Code extensions every developer should use..."></textarea></div>
+      <div class="btn-row"><button class="btn" onclick="runTool('listicleInput','listicleOutput','listicleLabel','listicleLoader','Write a complete, engaging listicle article based on this topic. Include a punchy intro, numbered items with descriptions, and a closing takeaway:\n\n','Listicle Generator')">Generate</button></div>
+      <div class="loader" id="listicleLoader"><div class="loader-dot"></div><div class="loader-dot"></div><div class="loader-dot"></div><span class="loader-txt">Writing...</span></div>
+      <div class="output" id="listicleOutput"><span class="output-label" id="listicleLabel"></span><span id="listicleText"></span></div>
+      <div class="output-actions"><button class="copy-btn" onclick="copyOutput('listicleText',this)">Copy</button></div>
+    </div>
+  </div>
+
+  <!-- ══ PAGE: UNIT TESTS -->
+  <div class="page" id="page-unittest">
+    <div class="page-header"><h1>Unit Test <span>Generator</span></h1><p>Paste a function — get tests written automatically</p></div>
+    <div class="divider"></div>
+    <div class="card">
+      <div class="section-title">Function to Test</div>
+      <div class="input-wrap"><textarea class="ai-input" id="unittestInput" rows="8" placeholder="Paste your function here..."></textarea></div>
+      <div class="btn-row"><button class="btn" onclick="runTool('unittestInput','unittestOutput','unittestLabel','unittestLoader','Generate comprehensive unit tests for this function. Cover happy paths, edge cases, and error cases. Use the appropriate test framework (Jest, PyTest, etc.) based on the language:\n\n','Unit Test Generator')">Generate Tests</button></div>
+      <div class="loader" id="unittestLoader"><div class="loader-dot"></div><div class="loader-dot"></div><div class="loader-dot"></div><span class="loader-txt">Generating...</span></div>
+      <div class="output" id="unittestOutput"><span class="output-label" id="unittestLabel"></span><span id="unittestText"></span></div>
+      <div class="output-actions"><button class="copy-btn" onclick="copyOutput('unittestText',this)">Copy</button></div>
+    </div>
+  </div>
+
+  <!-- ══ PAGE: CODE CONVERTER -->
+  <div class="page" id="page-converter">
+    <div class="page-header"><h1>Code <span>Converter</span></h1><p>Convert code between programming languages</p></div>
+    <div class="divider"></div>
+    <div class="card">
+      <div class="section-title">Conversion Settings</div>
+      <div style="display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap;align-items:center;">
+        <select class="ai-select" id="converterFrom">
+          <option>JavaScript</option><option>TypeScript</option><option>Python</option>
+          <option>Java</option><option>C#</option><option>C++</option><option>Go</option>
+          <option>Rust</option><option>PHP</option><option>Ruby</option><option>Swift</option><option>Kotlin</option>
+        </select>
+        <span style="color:var(--text-mid);font-size:18px;">→</span>
+        <select class="ai-select" id="converterTo">
+          <option>Python</option><option>JavaScript</option><option>TypeScript</option>
+          <option>Java</option><option>C#</option><option>C++</option><option>Go</option>
+          <option>Rust</option><option>PHP</option><option>Ruby</option><option>Swift</option><option>Kotlin</option>
+        </select>
+      </div>
+      <div class="input-wrap"><textarea class="ai-input" id="converterInput" rows="8" placeholder="Paste code to convert..."></textarea></div>
+      <div class="btn-row"><button class="btn" onclick="convertCode()">Convert</button></div>
+      <div class="loader" id="converterLoader"><div class="loader-dot"></div><div class="loader-dot"></div><div class="loader-dot"></div><span class="loader-txt">Converting...</span></div>
+      <div class="output" id="converterOutput"><span class="output-label" id="converterLabel"></span><span id="converterText"></span></div>
+      <div class="output-actions"><button class="copy-btn" onclick="copyOutput('converterText',this)">Copy</button></div>
+    </div>
+  </div>
+
+  <!-- ══ PAGE: REGEX BUILDER -->
+  <div class="page" id="page-regex">
+    <div class="page-header"><h1>Regex <span>Builder</span></h1><p>Describe what you want to match — get a regex pattern</p></div>
+    <div class="divider"></div>
+    <div class="card">
+      <div class="section-title">Describe the Pattern</div>
+      <div class="input-wrap"><textarea class="ai-input" id="regexInput" rows="3" placeholder="e.g. Match a valid email address, or match all phone numbers in the format (123) 456-7890..."></textarea></div>
+      <div class="btn-row"><button class="btn" onclick="runTool('regexInput','regexOutput','regexLabel','regexLoader','Create a regex pattern based on this description. Show the pattern, explain each part, give 3 test examples that match and 2 that should not match:\n\n','Regex Builder')">Build Regex</button></div>
+      <div class="loader" id="regexLoader"><div class="loader-dot"></div><div class="loader-dot"></div><div class="loader-dot"></div><span class="loader-txt">Building...</span></div>
+      <div class="output" id="regexOutput"><span class="output-label" id="regexLabel"></span><span id="regexText"></span></div>
+      <div class="output-actions"><button class="copy-btn" onclick="copyOutput('regexText',this)">Copy</button></div>
+    </div>
+  </div>
+
+  <!-- ══ PAGE: DEPENDENCY EXPLAINER -->
+  <div class="page" id="page-depexplain">
+    <div class="page-header"><h1>Dependency <span>Explainer</span></h1><p>Paste a package.json — get plain-English explanations</p></div>
+    <div class="divider"></div>
+    <div class="card">
+      <div class="section-title">Paste package.json</div>
+      <div class="input-wrap"><textarea class="ai-input" id="depexplainInput" rows="10" placeholder='Paste your package.json contents here...'></textarea></div>
+      <div class="btn-row"><button class="btn" onclick="runTool('depexplainInput','depexplainOutput','depexplainLabel','depexplainLoader','Explain every dependency and devDependency in this package.json in plain English. For each package: what it does, why it is used, and whether it is essential or optional:\n\n','Dependency Explainer')">Explain Deps</button></div>
+      <div class="loader" id="depexplainLoader"><div class="loader-dot"></div><div class="loader-dot"></div><div class="loader-dot"></div><span class="loader-txt">Analyzing...</span></div>
+      <div class="output" id="depexplainOutput"><span class="output-label" id="depexplainLabel"></span><span id="depexplainText"></span></div>
+      <div class="output-actions"><button class="copy-btn" onclick="copyOutput('depexplainText',this)">Copy</button></div>
+    </div>
+  </div>
+
+  <!-- ══ PAGE: CODE REVIEW -->
+  <div class="page" id="page-codereview">
+    <div class="page-header"><h1>Code <span>Review</span></h1><p>AI reviews your code for best practices, bugs, and improvements</p></div>
+    <div class="divider"></div>
+    <div class="card">
+      <div class="section-title">Paste Code for Review</div>
+      <div class="input-wrap"><textarea class="ai-input" id="codereviewInput" rows="10" placeholder="Paste code you want reviewed..."></textarea></div>
+      <div class="btn-row"><button class="btn" onclick="runTool('codereviewInput','codereviewOutput','codereviewLabel','codereviewLoader','Review this code thoroughly. Cover: correctness, potential bugs, performance, security, readability, best practices, and suggest specific improvements with examples:\n\n','Code Review')">Review Code</button></div>
+      <div class="loader" id="codereviewLoader"><div class="loader-dot"></div><div class="loader-dot"></div><div class="loader-dot"></div><span class="loader-txt">Reviewing...</span></div>
+      <div class="output" id="codereviewOutput"><span class="output-label" id="codereviewLabel"></span><span id="codereviewText"></span></div>
+      <div class="output-actions"><button class="copy-btn" onclick="copyOutput('codereviewText',this)">Copy</button></div>
+    </div>
+  </div>
+
+  <!-- ══ PAGE: PROMPT OPTIMIZER -->
+  <div class="page" id="page-promptopt">
+    <div class="page-header"><h1>Prompt <span>Optimizer</span></h1><p>Improve your AI prompts for better results</p></div>
+    <div class="divider"></div>
+    <div class="card">
+      <div class="section-title">Your Prompt</div>
+      <div class="input-wrap"><textarea class="ai-input" id="promptoptInput" rows="5" placeholder="Paste your AI prompt here..."></textarea></div>
+      <div class="btn-row"><button class="btn" onclick="runTool('promptoptInput','promptoptOutput','promptoptLabel','promptoptLoader','Analyze this AI prompt and rewrite it to be clearer, more specific, and more likely to get great results. Explain what you improved and why:\n\n','Prompt Optimizer')">Optimize</button></div>
+      <div class="loader" id="promptoptLoader"><div class="loader-dot"></div><div class="loader-dot"></div><div class="loader-dot"></div><span class="loader-txt">Optimizing...</span></div>
+      <div class="output" id="promptoptOutput"><span class="output-label" id="promptoptLabel"></span><span id="promptoptText"></span></div>
+      <div class="output-actions"><button class="copy-btn" onclick="copyOutput('promptoptText',this)">Copy</button></div>
+    </div>
+  </div>
+
+  <!-- ══ PAGE: IMAGE DESCRIBER -->
+  <div class="page" id="page-imgdesc">
+    <div class="page-header"><h1>AI Image <span>Describer</span></h1><p>Describe an image concept — AI writes alt text and descriptions</p></div>
+    <div class="divider"></div>
+    <div class="card">
+      <div class="section-title">Image Concept</div>
+      <div class="input-wrap"><textarea class="ai-input" id="imgdescInput" rows="3" placeholder="Describe an image (e.g. a photo of a developer at their desk with multiple monitors showing code)..."></textarea></div>
+      <div class="btn-row"><button class="btn" onclick="runTool('imgdescInput','imgdescOutput','imgdescLabel','imgdescLoader','Write: 1) A concise alt text (under 125 chars), 2) A detailed image description for accessibility (2–3 sentences), 3) An SEO-friendly caption, for this image concept:\n\n','Image Describer')">Generate Descriptions</button></div>
+      <div class="loader" id="imgdescLoader"><div class="loader-dot"></div><div class="loader-dot"></div><div class="loader-dot"></div><span class="loader-txt">Describing...</span></div>
+      <div class="output" id="imgdescOutput"><span class="output-label" id="imgdescLabel"></span><span id="imgdescText"></span></div>
+      <div class="output-actions"><button class="copy-btn" onclick="copyOutput('imgdescText',this)">Copy</button></div>
+    </div>
+  </div>
+
+  <!-- ══ PAGE: CHATBOT SCRIPT -->
+  <div class="page" id="page-chatbotscript">
+    <div class="page-header"><h1>Chatbot <span>Script Writer</span></h1><p>Generate chatbot conversation flows and responses</p></div>
+    <div class="divider"></div>
+    <div class="card">
+      <div class="section-title">Describe Your Chatbot</div>
+      <div class="input-wrap"><textarea class="ai-input" id="chatbotscriptInput" rows="4" placeholder="e.g. A customer support chatbot for a SaaS tool that handles billing questions, cancellations, and technical issues..."></textarea></div>
+      <div class="btn-row"><button class="btn" onclick="runTool('chatbotscriptInput','chatbotscriptOutput','chatbotscriptLabel','chatbotscriptLoader','Write a complete chatbot conversation script including: welcome message, common question flows, escalation triggers, error/fallback messages, and closing responses:\n\n','Chatbot Script')">Write Script</button></div>
+      <div class="loader" id="chatbotscriptLoader"><div class="loader-dot"></div><div class="loader-dot"></div><div class="loader-dot"></div><span class="loader-txt">Scripting...</span></div>
+      <div class="output" id="chatbotscriptOutput"><span class="output-label" id="chatbotscriptLabel"></span><span id="chatbotscriptText"></span></div>
+      <div class="output-actions"><button class="copy-btn" onclick="copyOutput('chatbotscriptText',this)">Copy</button></div>
+    </div>
+  </div>
+
+  <!-- ══ PAGE: COLOR PALETTE -->
+  <div class="page" id="page-colorpalette">
+    <div class="page-header"><h1>Color Palette <span>Generator</span></h1><p>Describe your vibe — get a full design palette</p></div>
+    <div class="divider"></div>
+    <div class="card">
+      <div class="section-title">Describe the Mood or Project</div>
+      <div class="input-wrap"><textarea class="ai-input" id="colorpaletteInput" rows="3" placeholder="e.g. A cybersecurity startup — dark, techy, trustworthy with a red accent..."></textarea></div>
+      <div class="btn-row"><button class="btn" onclick="generatePalette()">Generate Palette</button></div>
+      <div class="loader" id="colorpaletteLoader"><div class="loader-dot"></div><div class="loader-dot"></div><div class="loader-dot"></div><span class="loader-txt">Generating...</span></div>
+      <div id="paletteDisplay" style="display:none;margin-top:16px;">
+        <div id="paletteSwatches" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;"></div>
+        <div class="output visible" id="colorpaletteOutput"><span class="output-label" id="colorpaletteLabel"></span><span id="colorpaletteText"></span></div>
+        <div class="output-actions"><button class="copy-btn" onclick="copyOutput('colorpaletteText',this)">Copy</button></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ PAGE: UI COPY WRITER -->
+  <div class="page" id="page-uicopy">
+    <div class="page-header"><h1>UI Copy <span>Writer</span></h1><p>Generate button labels, tooltips, empty states, and microcopy</p></div>
+    <div class="divider"></div>
+    <div class="card">
+      <div class="section-title">Describe the UI Element</div>
+      <div class="input-wrap"><textarea class="ai-input" id="uicopyInput" rows="4" placeholder="e.g. Empty state for a todo app when there are no tasks, or CTA buttons for a SaaS pricing page..."></textarea></div>
+      <div class="btn-row"><button class="btn" onclick="runTool('uicopyInput','uicopyOutput','uicopyLabel','uicopyLoader','Write clear, concise UI microcopy for this element. Include multiple variations (3–5 options) for headlines, subtext, button labels, and any empty states:\n\n','UI Copy Writer')">Write Copy</button></div>
+      <div class="loader" id="uicopyLoader"><div class="loader-dot"></div><div class="loader-dot"></div><div class="loader-dot"></div><span class="loader-txt">Writing...</span></div>
+      <div class="output" id="uicopyOutput"><span class="output-label" id="uicopyLabel"></span><span id="uicopyText"></span></div>
+      <div class="output-actions"><button class="copy-btn" onclick="copyOutput('uicopyText',this)">Copy</button></div>
+    </div>
+  </div>
+
+  <!-- ══ PAGE: ICON DESCRIPTION -->
+  <div class="page" id="page-icondesc">
+    <div class="page-header"><h1>Icon <span>Description</span></h1><p>Describe a UI concept — get icon recommendations</p></div>
+    <div class="divider"></div>
+    <div class="card">
+      <div class="section-title">UI Action or Concept</div>
+      <div class="input-wrap"><textarea class="ai-input" id="icondescInput" rows="3" placeholder="e.g. Icons for a dashboard sidebar: home, settings, analytics, users, notifications..."></textarea></div>
+      <div class="btn-row"><button class="btn" onclick="runTool('icondescInput','icondescOutput','icondescLabel','icondescLoader','Suggest the best icons for these UI concepts. For each: recommend the ideal icon name from Lucide/Heroicons/FontAwesome, describe the shape, and explain why it communicates the concept clearly:\n\n','Icon Description')">Get Icons</button></div>
+      <div class="loader" id="icondescLoader"><div class="loader-dot"></div><div class="loader-dot"></div><div class="loader-dot"></div><span class="loader-txt">Suggesting...</span></div>
+      <div class="output" id="icondescOutput"><span class="output-label" id="icondescLabel"></span><span id="icondescText"></span></div>
+      <div class="output-actions"><button class="copy-btn" onclick="copyOutput('icondescText',this)">Copy</button></div>
+    </div>
+  </div>
+
+  <!-- ══ PAGE: INTERVIEW PREP -->
+  <div class="page" id="page-interview">
+    <div class="page-header"><h1>Interview <span>Prep</span></h1><p>Mock Q&A for any role or topic</p></div>
+    <div class="divider"></div>
+    <div class="card">
+      <div class="section-title">Role & Focus Area</div>
+      <div class="input-wrap"><textarea class="ai-input" id="interviewInput" rows="3" placeholder="e.g. Frontend developer interview — React, system design, and behavioral questions..."></textarea></div>
+      <div class="btn-row"><button class="btn" onclick="runTool('interviewInput','interviewOutput','interviewLabel','interviewLoader','Generate 10 realistic interview questions for this role/topic. For each question: show a strong sample answer, explain what the interviewer is really looking for, and give a tip to stand out:\n\n','Interview Prep')">Generate Q&A</button></div>
+      <div class="loader" id="interviewLoader"><div class="loader-dot"></div><div class="loader-dot"></div><div class="loader-dot"></div><span class="loader-txt">Preparing...</span></div>
+      <div class="output" id="interviewOutput"><span class="output-label" id="interviewLabel"></span><span id="interviewText"></span></div>
+      <div class="output-actions"><button class="copy-btn" onclick="copyOutput('interviewText',this)">Copy</button></div>
+    </div>
+  </div>
+
+  <!-- ══ PAGE: JOB DESCRIPTION ANALYZER -->
+  <div class="page" id="page-jobdesc">
+    <div class="page-header"><h1>Job Description <span>Analyzer</span></h1><p>Paste a job posting — AI breaks it down for you</p></div>
+    <div class="divider"></div>
+    <div class="card">
+      <div class="section-title">Paste Job Description</div>
+      <div class="input-wrap"><textarea class="ai-input" id="jobdescInput" rows="8" placeholder="Paste the full job description here..."></textarea></div>
+      <div class="btn-row"><button class="btn" onclick="runTool('jobdescInput','jobdescOutput','jobdescLabel','jobdescLoader','Analyze this job description. Extract: must-have skills, nice-to-have skills, red flags to watch for, questions to ask in the interview, how to tailor your resume, and an honest assessment of how demanding the role seems:\n\n','Job Description Analyzer')">Analyze</button></div>
+      <div class="loader" id="jobdescLoader"><div class="loader-dot"></div><div class="loader-dot"></div><div class="loader-dot"></div><span class="loader-txt">Analyzing...</span></div>
+      <div class="output" id="jobdescOutput"><span class="output-label" id="jobdescLabel"></span><span id="jobdescText"></span></div>
+      <div class="output-actions"><button class="copy-btn" onclick="copyOutput('jobdescText',this)">Copy</button></div>
+    </div>
+  </div>
+
+  <!-- ══ PAGE: SALARY NEGOTIATION -->
+  <div class="page" id="page-salary">
+    <div class="page-header"><h1>Salary Negotiation <span>Script</span></h1><p>AI writes a confident negotiation script for you</p></div>
+    <div class="divider"></div>
+    <div class="card">
+      <div class="section-title">Your Situation</div>
+      <div class="input-wrap"><textarea class="ai-input" id="salaryInput" rows="4" placeholder="e.g. I was offered $75k for a frontend dev role, I have 3 years experience and the market rate is $90k..."></textarea></div>
+      <div class="btn-row"><button class="btn" onclick="runTool('salaryInput','salaryOutput','salaryLabel','salaryLoader','Write a professional, confident salary negotiation script including: the opening statement, how to justify the ask, how to handle pushback, and a closing. Make it natural and non-confrontational:\n\n','Salary Negotiation Script')">Write Script</button></div>
+      <div class="loader" id="salaryLoader"><div class="loader-dot"></div><div class="loader-dot"></div><div class="loader-dot"></div><span class="loader-txt">Writing...</span></div>
+      <div class="output" id="salaryOutput"><span class="output-label" id="salaryLabel"></span><span id="salaryText"></span></div>
+      <div class="output-actions"><button class="copy-btn" onclick="copyOutput('salaryText',this)">Copy</button></div>
+    </div>
+  </div>
+
+  <!-- ══ PAGE: SLUG GENERATOR -->
+  <div class="page" id="page-sluggen">
+    <div class="page-header"><h1>Slug / Name <span>Generator</span></h1><p>AI-powered naming for projects, URLs, and more</p></div>
+    <div class="divider"></div>
+    <div class="card">
+      <div class="section-title">Describe What You Need to Name</div>
+      <div class="input-wrap"><textarea class="ai-input" id="sluggenInput" rows="3" placeholder="e.g. A dark-mode code editor app, or a URL slug for a blog post about React hooks..."></textarea></div>
+      <div class="btn-row"><button class="btn" onclick="runTool('sluggenInput','sluggenOutput','sluggenLabel','sluggenLoader','Generate 10 creative name and URL slug suggestions for this. For each: show the display name, the URL slug (kebab-case), and a one-line rationale:\n\n','Slug Generator')">Generate Names</button></div>
+      <div class="loader" id="sluggenLoader"><div class="loader-dot"></div><div class="loader-dot"></div><div class="loader-dot"></div><span class="loader-txt">Generating...</span></div>
+      <div class="output" id="sluggenOutput"><span class="output-label" id="sluggenLabel"></span><span id="sluggenText"></span></div>
+      <div class="output-actions"><button class="copy-btn" onclick="copyOutput('sluggenText',this)">Copy</button></div>
+    </div>
+  </div>
+
+  <!-- ══ PAGE: CRON EXPLAINER -->
+  <div class="page" id="page-cronexplain">
+    <div class="page-header"><h1>Cron Job <span>Explainer</span></h1><p>Paste a cron expression — get plain-English output</p></div>
+    <div class="divider"></div>
+    <div class="card">
+      <div class="section-title">Cron Expression</div>
+      <div class="input-wrap"><input class="ai-input" id="cronexplainInput" placeholder="e.g. */5 * * * * or 0 9 * * 1-5" /></div>
+      <div class="btn-row"><button class="btn" onclick="runTool('cronexplainInput','cronexplainOutput','cronexplainLabel','cronexplainLoader','Explain this cron expression in plain English. State exactly when it runs, give 3 real-world example use cases, and suggest similar schedules a developer might want:\n\n','Cron Explainer')">Explain</button></div>
+      <div class="loader" id="cronexplainLoader"><div class="loader-dot"></div><div class="loader-dot"></div><div class="loader-dot"></div><span class="loader-txt">Explaining...</span></div>
+      <div class="output" id="cronexplainOutput"><span class="output-label" id="cronexplainLabel"></span><span id="cronexplainText"></span></div>
+      <div class="output-actions"><button class="copy-btn" onclick="copyOutput('cronexplainText',this)">Copy</button></div>
+    </div>
+  </div>
+
+  <!-- ══ PAGE: HTTP STATUS -->
+  <div class="page" id="page-httpstatus">
+    <div class="page-header"><h1>HTTP Status <span>Explainer</span></h1><p>Paste a status code — get context and fixes</p></div>
+    <div class="divider"></div>
+    <div class="card">
+      <div class="section-title">Status Code or Error</div>
+      <div class="input-wrap"><input class="ai-input" id="httpstatusInput" placeholder="e.g. 403, 429, 502 Bad Gateway..." /></div>
+      <div class="btn-row"><button class="btn" onclick="runTool('httpstatusInput','httpstatusOutput','httpstatusLabel','httpstatusLoader','Explain this HTTP status code: what it means, common causes, how to fix it from both the client and server side, and a real-world example scenario:\n\n','HTTP Status Explainer')">Explain</button></div>
+      <div class="loader" id="httpstatusLoader"><div class="loader-dot"></div><div class="loader-dot"></div><div class="loader-dot"></div><span class="loader-txt">Looking up...</span></div>
+      <div class="output" id="httpstatusOutput"><span class="output-label" id="httpstatusLabel"></span><span id="httpstatusText"></span></div>
+      <div class="output-actions"><button class="copy-btn" onclick="copyOutput('httpstatusText',this)">Copy</button></div>
+    </div>
+  </div>
+
+  <!-- ══ PAGE: MARKDOWN PREVIEWER -->
+  <div class="page" id="page-mdpreview">
+    <div class="page-header"><h1>Markdown <span>Previewer</span></h1><p>Write or paste Markdown — see it rendered live</p></div>
+    <div class="divider"></div>
+    <div class="card">
+      <div class="section-title">Markdown Input</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+        <div>
+          <p style="font-size:11px;color:var(--text-mid);margin-bottom:8px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;">Input</p>
+          <textarea class="ai-input" id="mdInput" rows="18" placeholder="# Hello World&#10;&#10;Type **markdown** here and see it rendered live on the right..." oninput="renderMD()"></textarea>
+        </div>
+        <div>
+          <p style="font-size:11px;color:var(--text-mid);margin-bottom:8px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;">Preview</p>
+          <div id="mdPreview" style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);padding:16px;min-height:300px;font-size:13px;line-height:1.8;overflow-y:auto;max-height:400px;"></div>
+        </div>
+      </div>
+      <div class="btn-row" style="margin-top:14px;">
+        <button class="btn secondary" onclick="copyOutput('mdInput',this)">Copy Markdown</button>
+        <button class="btn secondary" onclick="document.getElementById('mdInput').value='';renderMD()">Clear</button>
+      </div>
+    </div>
+  </div>
+
 </div><!-- /main -->
 </div><!-- /layout -->
 
@@ -784,10 +1164,19 @@ const PAGE_TITLES = {
   chat:'AI Chat', image:'Image Generation', stream:'Streaming Essay', voice:'Voice Input',
   summarizer:'Text Summarizer', email:'Email Writer', resume:'Resume Rewriter',
   coverletter:'Cover Letter', essay:'Essay Grader', translator:'Translator', flashcards:'Flashcards',
+  blogpost:'Blog Post Writer', linkedin:'LinkedIn Bio', listicle:'Listicle Generator',
   explainer:'Code Explainer', bugfixer:'Bug Fixer', commenter:'Comment Writer',
   readme:'README Generator', apidocs:'API Docs', changelog:'Changelog', commit:'Git Commit',
-  terminal:'Terminal Helper', error:'Error Decoder', sql:'SQL Builder', json:'JSON Helper',
-  csv:'CSV Analyzer', apiexplain:'API Explainer', files:'Cloud Files', kv:'Key-Value Store'
+  terminal:'Terminal Helper', error:'Error Decoder',
+  unittest:'Unit Test Generator', converter:'Code Converter', regex:'Regex Builder',
+  depexplain:'Dependency Explainer', codereview:'Code Review',
+  sql:'SQL Builder', json:'JSON Helper', csv:'CSV Analyzer', apiexplain:'API Explainer',
+  promptopt:'Prompt Optimizer', imgdesc:'Image Describer', chatbotscript:'Chatbot Script',
+  colorpalette:'Color Palette', uicopy:'UI Copy Writer', icondesc:'Icon Description',
+  interview:'Interview Prep', jobdesc:'Job Description Analyzer', salary:'Salary Script',
+  sluggen:'Slug Generator', cronexplain:'Cron Explainer', httpstatus:'HTTP Status Explainer',
+  mdpreview:'Markdown Previewer',
+  files:'Cloud Files', kv:'Key-Value Store'
 };
 
 // ═══════════════════════════════════════════ INIT
@@ -814,16 +1203,38 @@ window.addEventListener('load', () => {
   });
 
   renderChatHistory();
+
+  // collapse all collapsible sections by default
+  document.querySelectorAll('.section-items').forEach(items => {
+    items.classList.add('collapsed');
+    if (items.previousElementSibling) items.previousElementSibling.classList.add('collapsed');
+  });
 });
+
+// ═══════════════════════════════════════════ COLLAPSIBLE SECTIONS
+function toggleSection(labelEl) {
+  const items = labelEl.nextElementSibling;
+  const isCollapsed = items.classList.contains('collapsed');
+  items.classList.toggle('collapsed', !isCollapsed);
+  labelEl.classList.toggle('collapsed', !isCollapsed);
+}
 
 // ═══════════════════════════════════════════ NAV
 function showPage(id) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
   document.getElementById('page-' + id).classList.add('active');
-  document.querySelector(`.nav-item[data-page="${id}"]`).classList.add('active');
-  document.getElementById('topbar-title').textContent = PAGE_TITLES[id] || id.toUpperCase();
-  // close mobile sidebar
+  const navItem = document.querySelector(`.nav-item[data-page="${id}"]`);
+  if (navItem) {
+    navItem.classList.add('active');
+    // auto-expand the section containing this item
+    const sectionItems = navItem.closest('.section-items');
+    if (sectionItems && sectionItems.classList.contains('collapsed')) {
+      sectionItems.classList.remove('collapsed');
+      if (sectionItems.previousElementSibling) sectionItems.previousElementSibling.classList.remove('collapsed');
+    }
+  }
+  document.getElementById('topbar-title').textContent = PAGE_TITLES[id] || id;
   document.getElementById('sidebar').classList.remove('open');
 }
 
@@ -1215,14 +1626,96 @@ function showToast(msg) {
   setTimeout(() => t.classList.remove('show'), 3000);
 }
 
-// ═══════════════════════════════════════════ ENTER KEY
+// ═══════════════════════════════════════════ CODE CONVERTER
+async function convertCode() {
+  const code = document.getElementById('converterInput').value.trim();
+  const from = document.getElementById('converterFrom').value;
+  const to   = document.getElementById('converterTo').value;
+  if (!code) { showToast('Paste code to convert'); return; }
+  if (!puterOk('converterOutput','converterText')) return;
+  const loader = document.getElementById('converterLoader');
+  const out    = document.getElementById('converterOutput');
+  loader.classList.add('active'); out.classList.remove('visible');
+  try {
+    const result = await callAI(`Convert this ${from} code to ${to}. Return only the converted code with brief inline comments explaining any major differences or gotchas:\n\n${code}`, 'gpt-4o-mini');
+    document.getElementById('converterLabel').textContent = `${from} → ${to}`;
+    document.getElementById('converterText').textContent = result;
+    out.classList.add('visible');
+  } catch(e) {
+    document.getElementById('converterLabel').textContent = 'ERROR';
+    document.getElementById('converterText').textContent = e.message || String(e);
+    out.classList.add('visible');
+  } finally { loader.classList.remove('active'); }
+}
+
+// ═══════════════════════════════════════════ COLOR PALETTE
+async function generatePalette() {
+  const desc = document.getElementById('colorpaletteInput').value.trim();
+  if (!desc) { showToast('Describe the mood first'); return; }
+  if (!puterOk('colorpaletteOutput','colorpaletteText')) return;
+  const loader = document.getElementById('colorpaletteLoader');
+  loader.classList.add('active');
+  document.getElementById('paletteDisplay').style.display = 'none';
+  try {
+    const result = await callAI(
+      'Generate a design color palette based on this description. Return ONLY a JSON object like: {"name":"Palette Name","colors":[{"name":"Primary","hex":"#hex","use":"usage description"},...],"description":"overall palette description"} with 5-6 colors covering primary, secondary, accent, background, surface, and text roles. No markdown, no extra text.\n\n' + desc,
+      'gpt-4o-mini'
+    );
+    const clean = result.replace(/```json|```/g,'').trim();
+    const palette = JSON.parse(clean);
+    const swatches = document.getElementById('paletteSwatches');
+    swatches.innerHTML = palette.colors.map(c => `
+      <div style="text-align:center;cursor:pointer;" onclick="navigator.clipboard.writeText('${c.hex}');showToast('Copied ${c.hex}!')">
+        <div style="width:64px;height:64px;background:${c.hex};border-radius:10px;margin-bottom:6px;border:1px solid rgba(255,255,255,.1);box-shadow:0 2px 8px rgba(0,0,0,.3);"></div>
+        <div style="font-size:10px;font-weight:600;color:var(--text);">${c.name}</div>
+        <div style="font-size:10px;color:var(--text-mid);">${c.hex}</div>
+      </div>`).join('');
+    document.getElementById('colorpaletteLabel').textContent = palette.name;
+    document.getElementById('colorpaletteText').textContent = palette.description + '\n\n' + palette.colors.map(c => `${c.name} (${c.hex}) — ${c.use}`).join('\n');
+    document.getElementById('paletteDisplay').style.display = 'block';
+  } catch(e) {
+    document.getElementById('colorpaletteLabel').textContent = 'ERROR';
+    document.getElementById('colorpaletteText').textContent = e.message || String(e);
+    document.getElementById('paletteDisplay').style.display = 'block';
+  } finally { loader.classList.remove('active'); }
+}
+
+// ═══════════════════════════════════════════ MARKDOWN PREVIEWER
+function renderMD() {
+  const raw = document.getElementById('mdInput').value;
+  const preview = document.getElementById('mdPreview');
+  // Basic markdown renderer
+  let html = raw
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/^######\s(.+)$/gm,'<h6>$1</h6>')
+    .replace(/^#####\s(.+)$/gm,'<h5>$1</h5>')
+    .replace(/^####\s(.+)$/gm,'<h4>$1</h4>')
+    .replace(/^###\s(.+)$/gm,'<h3 style="color:var(--red);font-family:var(--font-display);font-size:16px;font-weight:700;margin:14px 0 6px;">$1</h3>')
+    .replace(/^##\s(.+)$/gm,'<h2 style="color:var(--text);font-family:var(--font-display);font-size:18px;font-weight:700;margin:18px 0 8px;border-bottom:1px solid var(--border);padding-bottom:6px;">$1</h2>')
+    .replace(/^#\s(.+)$/gm,'<h1 style="color:var(--text);font-family:var(--font-display);font-size:22px;font-weight:800;margin:0 0 12px;letter-spacing:-0.5px;">$1</h1>')
+    .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
+    .replace(/\*(.+?)\*/g,'<em>$1</em>')
+    .replace(/`([^`]+)`/g,'<code style="background:var(--bg4);padding:2px 6px;border-radius:4px;font-family:monospace;font-size:12px;color:var(--red);">$1</code>')
+    .replace(/```[\s\S]*?```/g, m => {
+      const code = m.replace(/```\w*\n?/g,'').replace(/```/g,'');
+      return `<pre style="background:var(--bg4);border:1px solid var(--border);border-radius:8px;padding:14px;overflow-x:auto;margin:12px 0;font-size:12px;line-height:1.6;">${code}</pre>`;
+    })
+    .replace(/^\>\s(.+)$/gm,'<blockquote style="border-left:3px solid var(--red);margin:10px 0;padding:8px 14px;background:var(--red-soft);border-radius:0 6px 6px 0;font-style:italic;color:var(--text-mid);">$1</blockquote>')
+    .replace(/^[-*]\s(.+)$/gm,'<li style="margin:4px 0;">$1</li>')
+    .replace(/^\d+\.\s(.+)$/gm,'<li style="margin:4px 0;">$1</li>')
+    .replace(/(<li.*<\/li>\n?)+/g, m => `<ul style="padding-left:20px;margin:8px 0;">${m}</ul>`)
+    .replace(/\[(.+?)\]\((.+?)\)/g,'<a href="$2" style="color:var(--red);text-decoration:underline;" target="_blank">$1</a>')
+    .replace(/^---$/gm,'<hr style="border:none;border-top:1px solid var(--border);margin:16px 0;">')
+    .replace(/\n\n/g,'</p><p style="margin:8px 0;">')
+    .replace(/\n/g,'<br>');
+  preview.innerHTML = '<p style="margin:8px 0;">' + html + '</p>';
+}
+
 window.addEventListener('keydown', e => {
   if (e.key==='Enter' && !e.shiftKey && document.activeElement?.id==='chatInput') {
     e.preventDefault(); sendChat();
   }
 });
 </script>
-</body>
-</html>
 </body>
 </html>
