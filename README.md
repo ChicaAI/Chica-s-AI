@@ -1,7 +1,7 @@
 <div align="center">
 
 <!-- Animated header banner -->
-![Header](https://capsule-render.vercel.app/api?type=waving&color=gradient&customColorList=6,11,20&height=200&section=header&text=Glitch's%20AI&fontSize=60&fontColor=ff1a1a&animation=fadeIn&fontAlignY=38&desc=Building%20in%20silence.%20Shipping%20with%20fire.&descAlignY=60&descSize=16)
+![Header](https://capsule-render.vercel.app/api?type=waving&color=gradient&customColorList=6,11,20&height=200&section=header&text=Glitch%20AI&fontSize=60&fontColor=ff1a1a&animation=fadeIn&fontAlignY=38&desc=Building%20in%20silence.%20Shipping%20with%20fire.&descAlignY=60&descSize=16)
 
 <!-- Profile views badge -->
 ![Profile Views](https://komarev.com/ghpvc/?username=ChicaAI&color=ff1a1a&style=flat-square&label=PROFILE+VIEWS)
